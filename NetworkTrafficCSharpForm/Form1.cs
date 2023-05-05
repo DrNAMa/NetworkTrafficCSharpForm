@@ -10,27 +10,47 @@ using System.Threading;
 using System.Linq.Expressions;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.IO;
+using System.Data.SqlClient;
+using System.Security.Cryptography;
 
 namespace NetworkTrafficCSharpForm
 {
     public partial class Form1 : Form
     {
+        SqlConnection connection = null;
+        // Define your connection string to connect to your SQL Server database
+        string connectionString = "Data Source=(local);Initial Catalog=YourDatabaseName;Integrated Security=True";
+
+        // Define the SQL query to insert the data into the database
+        string query = "INSERT INTO YourTableName (Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country, SourceIP, DestinationIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version) " +
+                "VALUES (@Organization, @OrgName, @OrgId, @Address, @City, @StateProv, @PostalCode, @Country, @SourceIP, @DestinationIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version)";
+
+
+
+        // Import the kernel32.dll library
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
+
         private ICaptureDevice captureDevice;
         public Form1()
         {
             InitializeComponent();
+            AllocConsole();
+
+            // Redirect the standard output stream to the console window
+            StreamWriter writer = new StreamWriter(Console.OpenStandardOutput())
+            {
+                AutoFlush = true
+            };
+            Console.SetOut(writer);
+            // Test the console output
+            Console.WriteLine("This is a test message");
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Capture an Ethernet packet
-            byte[] packetData = CaptureEthernetPacket();
-
-            // Decode the Ethernet header
-            EthernetHeader header = DecodeEthernetHeader(packetData);
-
-            // Display the source and destination MAC addresses
-            Console.WriteLine("Source MAC: {0}", header.SourceMAC);
-            Console.WriteLine("Destination MAC: {0}", header.DestinationMAC);
+           
         }
         private void GetIPData(string eyepee)
         {
@@ -49,27 +69,8 @@ namespace NetworkTrafficCSharpForm
             if (text != null)
             {
                 IsolateData(text);
-            }        
-            
-            //Console.WriteLine(text);
-            //Thread.Sleep(100);
+            }      
         }
-        //private void IsolateData(string derter)
-        //{
-        //    string[] searchWords = { "Organization:", "OrgName:", "OrgId:", "Address:", "City:", "StateProv:", "PostalCode:", "Country:" };
-        //    foreach (string word in searchWords)
-        //    {
-        //        int index = derter.IndexOf(word);
-        //        if (index >= 0)
-        //        {
-        //            string value = derter.Substring(index + word.Length).Trim();
-        //            Console.WriteLine(word + " " + value);
-        //        }
-        //    }
-
-
-        //}
-
         private void IsolateData(string derter)
         {
             string[] searchWords = { "Organization:", "OrgName:", "OrgId:", "Address:", "City:", "StateProv:", "PostalCode:", "Country:" };
@@ -89,7 +90,6 @@ namespace NetworkTrafficCSharpForm
                 }
             }
         }
-
         private void OnPacketArrival(object sender, PacketCapture e)
         {
             // Get the captured packet
@@ -220,7 +220,68 @@ namespace NetworkTrafficCSharpForm
 
             // Return the EthernetHeader object
             return header;
-        }     
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            // Capture an Ethernet packet
+            byte[] packetData = CaptureEthernetPacket();
+
+            // Decode the Ethernet header
+            EthernetHeader header = DecodeEthernetHeader(packetData);
+
+            // Display the source and destination MAC addresses
+            Console.WriteLine("Source MAC: {0}", header.SourceMAC);
+            Console.WriteLine("Destination MAC: {0}", header.DestinationMAC);
+        }
+
+        private void InsertPacketToDatabase(string sourceIP, string destIP, string protocol, int packetSize, string packetColor, bool hasPayloadPacket, bool hasPayloadData, bool isPayloadInitialized, int headerLength, string headerData, int hopLimit, int payloadDataLength, string payloadPacket, int timeToLive, int totalLength, int totalPacketLength, string version, string organization, string orgName, string orgId, string address, string city, string stateProv, string postalCode, string country)
+        {
+            // Check if the IP and company already exist in the database
+            string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP OR DestIP = @DestIP OR Organization = @Organization";
+            SqlCommand cmd = new SqlCommand(query, connection);
+            cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
+            cmd.Parameters.AddWithValue("@DestIP", destIP);
+            cmd.Parameters.AddWithValue("@Organization", organization);
+            int count = (int)cmd.ExecuteScalar();
+
+            // If the IP and company do not exist in the database, insert a new row
+            if (count == 0)
+            {
+                query = "INSERT INTO Packets (SourceIP, DestIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version, Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country) VALUES (@SourceIP, @DestIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version, @Organization, @OrgName, @OrgId, @Address, @City, @StateProv, @PostalCode, @Country)";
+                cmd = new SqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
+                cmd.Parameters.AddWithValue("@DestIP", destIP);
+                cmd.Parameters.AddWithValue("@Protocol", protocol);
+                cmd.Parameters.AddWithValue("@PacketSize", packetSize);
+                cmd.Parameters.AddWithValue("@PacketColor", packetColor);
+                cmd.Parameters.AddWithValue("@HasPayloadPacket", hasPayloadPacket);
+                cmd.Parameters.AddWithValue("@HasPayloadData", hasPayloadData);
+                cmd.Parameters.AddWithValue("@IsPayloadInitialized", isPayloadInitialized);
+                cmd.Parameters.AddWithValue("@HeaderLength", headerLength);
+                cmd.Parameters.AddWithValue("@HeaderData", headerData);
+                cmd.Parameters.AddWithValue("@HopLimit", hopLimit);
+                cmd.Parameters.AddWithValue("@PayloadDataLength", payloadDataLength);
+                cmd.Parameters.AddWithValue("@PayloadPacket", payloadPacket);
+                cmd.Parameters.AddWithValue("@TimeToLive", timeToLive);
+                cmd.Parameters.AddWithValue("@TotalLength", totalLength);
+                cmd.Parameters.AddWithValue("@TotalPacketLength", totalPacketLength);
+                cmd.Parameters.AddWithValue("@Version", version);
+                cmd.Parameters.AddWithValue("@Organization", organization);
+                cmd.Parameters.AddWithValue("@OrgName", orgName);
+                cmd.Parameters.AddWithValue("@OrgId", orgId);
+                cmd.Parameters.AddWithValue("@Address", address);
+                cmd.Parameters.AddWithValue("@City", city);
+                cmd.Parameters.AddWithValue("@StateProv", stateProv);
+                cmd.Parameters.AddWithValue("@PostalCode", postalCode);
+                cmd.Parameters.AddWithValue("@Country", country);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+
+
+
     }
     class EthernetHeader
     {
