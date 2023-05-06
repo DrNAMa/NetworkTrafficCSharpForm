@@ -13,6 +13,8 @@ using System.Text;
 using System.IO;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
+using PacketDotNet.Ieee80211;
+using System.Collections.Generic;
 
 namespace NetworkTrafficCSharpForm
 {
@@ -20,12 +22,11 @@ namespace NetworkTrafficCSharpForm
     {
         SqlConnection connection = null;
         // Define your connection string to connect to your SQL Server database
-        string connectionString = "Data Source=(local);Initial Catalog=YourDatabaseName;Integrated Security=True";
+        string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True";
 
         // Define the SQL query to insert the data into the database
         string query = "INSERT INTO YourTableName (Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country, SourceIP, DestinationIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version) " +
                 "VALUES (@Organization, @OrgName, @OrgId, @Address, @City, @StateProv, @PostalCode, @Country, @SourceIP, @DestinationIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version)";
-
 
 
         // Import the kernel32.dll library
@@ -46,7 +47,7 @@ namespace NetworkTrafficCSharpForm
             };
             Console.SetOut(writer);
             // Test the console output
-            Console.WriteLine("This is a test message");
+          //  Console.WriteLine("This is a test message");
         }
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -71,6 +72,7 @@ namespace NetworkTrafficCSharpForm
                 IsolateData(text);
             }      
         }
+        private List<String> carrylist = new List<string>();
         private void IsolateData(string derter)
         {
             string[] searchWords = { "Organization:", "OrgName:", "OrgId:", "Address:", "City:", "StateProv:", "PostalCode:", "Country:" };
@@ -87,6 +89,7 @@ namespace NetworkTrafficCSharpForm
                     }
                     string value = derter.Substring(index + word.Length, endIndex - index - word.Length).Trim();
                     Console.WriteLine(word + " " + value);
+                    carrylist.Add(value);
                 }
             }
         }
@@ -103,8 +106,32 @@ namespace NetworkTrafficCSharpForm
                 // Check if the packet is coming from or going to a computer on your network
                 if (ipPacket.DestinationAddress.ToString().StartsWith("192.168.1.") || ipPacket.SourceAddress.ToString().StartsWith("192.168.1."))
                 {
+                    
+            //            // Check if the IP and company already exist in the database
+            //string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP OR DestIP = @DestIP OR Organization = @Organization";
+            //        SqlCommand cmd = new SqlCommand(query, connection);
+            //        cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
+            //        cmd.Parameters.AddWithValue("@DestIP", destIP);
+            //        cmd.Parameters.AddWithValue("@Organization", organization);
+            //        int count = (int)cmd.ExecuteScalar();
+
+            //        // If the IP and company do not exist in the database, insert a new row
+            //        if (count == 0)
+            //        { 
+            //        }
+
                     if (!ipPacket.SourceAddress.ToString().StartsWith("192"))
                     {
+                        // Check if the IP and company already exist in the database
+                        string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP OR DestIP = @DestIP OR Organization = @Organization";
+                        SqlCommand cmd = new SqlCommand(query, connection);
+                        cmd.Parameters.AddWithValue("@SourceIP", ipPacket.SourceAddress.ToString());                        
+                        int count = (int)cmd.ExecuteScalar();
+                        // If the IP and company do not exist in the database, insert a new row
+                        if (count == 0)
+                        {
+                        }
+
                         GetIPData(ipPacket.SourceAddress.ToString());
                     }
                     else
@@ -146,7 +173,12 @@ namespace NetworkTrafficCSharpForm
                     Console.WriteLine("Total Packet Length: " + ipPacket.TotalPacketLength.ToString());
                     Console.WriteLine("Version: " + ipPacket.Version.ToString());
                     Console.WriteLine("");
-                  //  Console.WriteLine("Protocol: " + ipPacket.Bytes.Length.ToString());
+                    //  Console.WriteLine("Protocol: " + ipPacket.Bytes.Length.ToString());
+                    InsertPacketToDatabase(ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
+                        ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, ipPacket.HeaderData.ToString(),
+                        ipPacket.HopLimit, ipPacket.PayloadLength, ipPacket.PayloadPacket.ToString(), ipPacket.TimeToLive, ipPacket.TotalLength, ipPacket.TotalPacketLength,
+                        ipPacket.Version.ToString(), carrylist[0], carrylist[1], carrylist[2], carrylist[3], carrylist[4], carrylist[5], carrylist[6], carrylist[7]);
+                    carrylist.Clear();
                 }
             }
         }
@@ -157,8 +189,8 @@ namespace NetworkTrafficCSharpForm
                 // Get the list of available capture devices
                 var devices = CaptureDeviceList.Instance;
 
-                // Select the first available device
-                captureDevice = devices[2];
+                // Select the first available device 0 for W  2? for H
+                captureDevice = devices[0];
                 DeviceModes mode = DeviceModes.None;
                 int read_timeout = 1000;
                 var configuration = new DeviceConfiguration()
@@ -199,10 +231,8 @@ namespace NetworkTrafficCSharpForm
             int timeout = 120;
             PingOptions options = new PingOptions(64, true);
             PingReply reply = pingSender.Send("localhost", timeout, buffer, options);
-
             // Get the raw packet data from the reply buffer
             byte[] packetData = reply.Buffer;
-
             return packetData;
         }
 
