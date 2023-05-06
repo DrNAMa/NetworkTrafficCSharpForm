@@ -15,17 +15,17 @@ using System.Data.SqlClient;
 using System.Security.Cryptography;
 using PacketDotNet.Ieee80211;
 using System.Collections.Generic;
-
+//PREEETY MUCH TELL THIS APP TO IGNORE NOT PUTTING YOUR OWN IP RANGE AS BLANK AND NOT RUNNING THEM THROUGH THE INFORMATION FINDER
 namespace NetworkTrafficCSharpForm
 {
     public partial class Form1 : Form
     {
         SqlConnection connection = null;
         // Define your connection string to connect to your SQL Server database
-        string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True";
+        string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\Source\\Repos\\DrNAMa\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True";
 
         // Define the SQL query to insert the data into the database
-        string query = "INSERT INTO YourTableName (Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country, SourceIP, DestinationIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version) " +
+        string query = "INSERT INTO IPLog (Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country, SourceIP, DestinationIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version) " +
                 "VALUES (@Organization, @OrgName, @OrgId, @Address, @City, @StateProv, @PostalCode, @Country, @SourceIP, @DestinationIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version)";
 
 
@@ -107,37 +107,84 @@ namespace NetworkTrafficCSharpForm
                 if (ipPacket.DestinationAddress.ToString().StartsWith("192.168.1.") || ipPacket.SourceAddress.ToString().StartsWith("192.168.1."))
                 {
                     
-            //            // Check if the IP and company already exist in the database
-            //string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP OR DestIP = @DestIP OR Organization = @Organization";
-            //        SqlCommand cmd = new SqlCommand(query, connection);
-            //        cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
-            //        cmd.Parameters.AddWithValue("@DestIP", destIP);
-            //        cmd.Parameters.AddWithValue("@Organization", organization);
-            //        int count = (int)cmd.ExecuteScalar();
-
-            //        // If the IP and company do not exist in the database, insert a new row
-            //        if (count == 0)
-            //        { 
-            //        }
+     
 
                     if (!ipPacket.SourceAddress.ToString().StartsWith("192"))
                     {
-                        // Check if the IP and company already exist in the database
-                        string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP OR DestIP = @DestIP OR Organization = @Organization";
-                        SqlCommand cmd = new SqlCommand(query, connection);
-                        cmd.Parameters.AddWithValue("@SourceIP", ipPacket.SourceAddress.ToString());                        
-                        int count = (int)cmd.ExecuteScalar();
-                        // If the IP and company do not exist in the database, insert a new row
-                        if (count == 0)
-                        {
-                        }
 
-                        GetIPData(ipPacket.SourceAddress.ToString());
+                        using (SqlConnection connection = new SqlConnection(connectionString))
+                        {
+                            connection.Open();
+
+                            // Create the SqlCommand object with the connection
+                            SqlCommand cmd = new SqlCommand();
+                            cmd.Connection = connection;
+
+                            // Set the command text and parameters
+                            cmd.CommandText = "SELECT COUNT(*) FROM IPLog WHERE SourceIP = @SourceIP";
+                            // Add any necessary parameters
+                            cmd.Parameters.AddWithValue("@SourceIP", ipPacket.SourceAddress.ToString());
+                            // Execute the scalar query
+                            int count = (int)cmd.ExecuteScalar();
+                            if (count == 0)
+                            {
+                                GetIPData(ipPacket.SourceAddress.ToString());
+                            }
+                        }
+                       
+
+
+                        // Check if the IP and company already exist in the database
+                        //   string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP OR DestIP = @DestIP OR Organization = @Organization";
+                        //  SqlCommand cmd = new SqlCommand(query, connection);
+
+                        //   int count = (int)cmd.ExecuteScalar();
+                        // If the IP  does not exist in the database, insert a new row
+
+
+
                     }
                     else
                     {
-                        GetIPData(ipPacket.DestinationAddress.ToString());
+                        //// Check if the IP and company already exist in the database
+                        //string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP";
+                        //SqlCommand cmd = new SqlCommand(query, connection);
+                        //cmd.Parameters.AddWithValue("@SourceIP", ipPacket.SourceAddress.ToString());
+                        //int count = (int)cmd.ExecuteScalar();
+                        //// If the IP  does not exist in the database, insert a new row
+                        //if (count == 0)
+                        //{
+
+
+
+
+                        using (SqlConnection connection = new SqlConnection(connectionString))
+                        {
+                            connection.Open();
+
+                            // Create the SqlCommand object with the connection
+                            SqlCommand cmd = new SqlCommand();
+                            cmd.Connection = connection;
+
+                            // Set the command text and parameters
+                            cmd.CommandText = "SELECT COUNT(*) FROM IPLog WHERE DestIP = @DestIP";
+                            // Add any necessary parameters
+                            cmd.Parameters.AddWithValue("@DestIP", ipPacket.DestinationAddress.ToString());
+                            // Execute the scalar query
+                            int count = (int)cmd.ExecuteScalar();
+                            if (count == 0)
+                            {
+                                GetIPData(ipPacket.DestinationAddress.ToString());
+                            }
+                        }
+
+
+
+                        //  }
+
                     }
+           
+
                     // Display the source and destination IP addresses and the protocol of the captured packet
                     Console.WriteLine("Source IP: " + ipPacket.SourceAddress.ToString());
                     Console.WriteLine("Destination IP: " + ipPacket.DestinationAddress.ToString());
@@ -174,10 +221,20 @@ namespace NetworkTrafficCSharpForm
                     Console.WriteLine("Version: " + ipPacket.Version.ToString());
                     Console.WriteLine("");
                     //  Console.WriteLine("Protocol: " + ipPacket.Bytes.Length.ToString());
-                    InsertPacketToDatabase(ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
-                        ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, ipPacket.HeaderData.ToString(),
-                        ipPacket.HopLimit, ipPacket.PayloadLength, ipPacket.PayloadPacket.ToString(), ipPacket.TimeToLive, ipPacket.TotalLength, ipPacket.TotalPacketLength,
-                        ipPacket.Version.ToString(), carrylist[0], carrylist[1], carrylist[2], carrylist[3], carrylist[4], carrylist[5], carrylist[6], carrylist[7]);
+                    if (carrylist.Count > 0)
+                    {
+                        InsertPacketToDatabase(ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
+                                             ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, ipPacket.HeaderData.ToString(),
+                                             ipPacket.HopLimit, ipPacket.PayloadLength, ipPacket.PayloadPacket.ToString(), ipPacket.TimeToLive, ipPacket.TotalLength, ipPacket.TotalPacketLength,
+                                             ipPacket.Version.ToString(), carrylist[0], carrylist[1], carrylist[2], carrylist[3], carrylist[4], carrylist[5], carrylist[6], carrylist[7]);
+                    }
+                    else
+                    {
+                        InsertPacketToDatabase(ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
+                                             ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, ipPacket.HeaderData.ToString(),
+                                             ipPacket.HopLimit, ipPacket.PayloadLength, ipPacket.PayloadPacket.ToString(), ipPacket.TimeToLive, ipPacket.TotalLength, ipPacket.TotalPacketLength,
+                                             ipPacket.Version.ToString(), null,null,null,null,null,null,null,null);
+                    }                     
                     carrylist.Clear();
                 }
             }
@@ -190,7 +247,7 @@ namespace NetworkTrafficCSharpForm
                 var devices = CaptureDeviceList.Instance;
 
                 // Select the first available device 0 for W  2? for H
-                captureDevice = devices[0];
+                captureDevice = devices[2];
                 DeviceModes mode = DeviceModes.None;
                 int read_timeout = 1000;
                 var configuration = new DeviceConfiguration()
@@ -267,49 +324,94 @@ namespace NetworkTrafficCSharpForm
 
         private void InsertPacketToDatabase(string sourceIP, string destIP, string protocol, int packetSize, string packetColor, bool hasPayloadPacket, bool hasPayloadData, bool isPayloadInitialized, int headerLength, string headerData, int hopLimit, int payloadDataLength, string payloadPacket, int timeToLive, int totalLength, int totalPacketLength, string version, string organization, string orgName, string orgId, string address, string city, string stateProv, string postalCode, string country)
         {
-            // Check if the IP and company already exist in the database
-            string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP OR DestIP = @DestIP OR Organization = @Organization";
-            SqlCommand cmd = new SqlCommand(query, connection);
-            cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
-            cmd.Parameters.AddWithValue("@DestIP", destIP);
-            cmd.Parameters.AddWithValue("@Organization", organization);
-            int count = (int)cmd.ExecuteScalar();
 
-            // If the IP and company do not exist in the database, insert a new row
-            if (count == 0)
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                query = "INSERT INTO Packets (SourceIP, DestIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version, Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country) VALUES (@SourceIP, @DestIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version, @Organization, @OrgName, @OrgId, @Address, @City, @StateProv, @PostalCode, @Country)";
-                cmd = new SqlCommand(query, connection);
+                connection.Open();
+
+                // Create the SqlCommand object with the connection
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = connection;
+
+                // Set the command text and parameters
+                cmd.CommandText = "SELECT COUNT(*) FROM IPLog WHERE SourceIP = @SourceIP";
+                // Add any necessary parameters
                 cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
-                cmd.Parameters.AddWithValue("@DestIP", destIP);
-                cmd.Parameters.AddWithValue("@Protocol", protocol);
-                cmd.Parameters.AddWithValue("@PacketSize", packetSize);
-                cmd.Parameters.AddWithValue("@PacketColor", packetColor);
-                cmd.Parameters.AddWithValue("@HasPayloadPacket", hasPayloadPacket);
-                cmd.Parameters.AddWithValue("@HasPayloadData", hasPayloadData);
-                cmd.Parameters.AddWithValue("@IsPayloadInitialized", isPayloadInitialized);
-                cmd.Parameters.AddWithValue("@HeaderLength", headerLength);
-                cmd.Parameters.AddWithValue("@HeaderData", headerData);
-                cmd.Parameters.AddWithValue("@HopLimit", hopLimit);
-                cmd.Parameters.AddWithValue("@PayloadDataLength", payloadDataLength);
-                cmd.Parameters.AddWithValue("@PayloadPacket", payloadPacket);
-                cmd.Parameters.AddWithValue("@TimeToLive", timeToLive);
-                cmd.Parameters.AddWithValue("@TotalLength", totalLength);
-                cmd.Parameters.AddWithValue("@TotalPacketLength", totalPacketLength);
-                cmd.Parameters.AddWithValue("@Version", version);
-                cmd.Parameters.AddWithValue("@Organization", organization);
-                cmd.Parameters.AddWithValue("@OrgName", orgName);
-                cmd.Parameters.AddWithValue("@OrgId", orgId);
-                cmd.Parameters.AddWithValue("@Address", address);
-                cmd.Parameters.AddWithValue("@City", city);
-                cmd.Parameters.AddWithValue("@StateProv", stateProv);
-                cmd.Parameters.AddWithValue("@PostalCode", postalCode);
-                cmd.Parameters.AddWithValue("@Country", country);
-                cmd.ExecuteNonQuery();
-            }
+                
+                // Execute the scalar query
+                int count = (int)cmd.ExecuteScalar();
+
+
+
+
+                // Check if the IP and company already exist in the database
+                // string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP OR DestIP = @DestIP";
+                // SqlCommand cmd = new SqlCommand(query, connection);
+                // cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
+                // cmd.Parameters.AddWithValue("@DestIP", destIP);          
+                // int count = (int)cmd.ExecuteScalar();
+
+                // If the IP and company do not exist in the database, insert a new row
+                if (count == 0)
+                {
+                    if (organization is null)
+                    {
+                        query = "INSERT INTO IpLog (SourceIP, DestIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version) VALUES (@SourceIP, @DestIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version)";
+                        cmd = new SqlCommand(query, connection);
+                        cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
+                        cmd.Parameters.AddWithValue("@DestIP", destIP);
+                        cmd.Parameters.AddWithValue("@Protocol", protocol);
+                        cmd.Parameters.AddWithValue("@PacketSize", packetSize);
+                        cmd.Parameters.AddWithValue("@PacketColor", packetColor);
+                        cmd.Parameters.AddWithValue("@HasPayloadPacket", hasPayloadPacket);
+                        cmd.Parameters.AddWithValue("@HasPayloadData", hasPayloadData);
+                        cmd.Parameters.AddWithValue("@IsPayloadInitialized", isPayloadInitialized);
+                        cmd.Parameters.AddWithValue("@HeaderLength", headerLength);
+                        cmd.Parameters.AddWithValue("@HeaderData", headerData);
+                        cmd.Parameters.AddWithValue("@HopLimit", hopLimit);
+                        cmd.Parameters.AddWithValue("@PayloadDataLength", payloadDataLength);
+                        cmd.Parameters.AddWithValue("@PayloadPacket", payloadPacket);
+                        cmd.Parameters.AddWithValue("@TimeToLive", timeToLive);
+                        cmd.Parameters.AddWithValue("@TotalLength", totalLength);
+                        cmd.Parameters.AddWithValue("@TotalPacketLength", totalPacketLength);
+                        cmd.Parameters.AddWithValue("@Version", version);
+                        cmd.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        query = "INSERT INTO IpLog (SourceIP, DestIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version, Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country) VALUES (@SourceIP, @DestIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version, @Organization, @OrgName, @OrgId, @Address, @City, @StateProv, @PostalCode, @Country)";
+                        cmd = new SqlCommand(query, connection);
+                        cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
+                        cmd.Parameters.AddWithValue("@DestIP", destIP);
+                        cmd.Parameters.AddWithValue("@Protocol", protocol);
+                        cmd.Parameters.AddWithValue("@PacketSize", packetSize);
+                        cmd.Parameters.AddWithValue("@PacketColor", packetColor);
+                        cmd.Parameters.AddWithValue("@HasPayloadPacket", hasPayloadPacket);
+                        cmd.Parameters.AddWithValue("@HasPayloadData", hasPayloadData);
+                        cmd.Parameters.AddWithValue("@IsPayloadInitialized", isPayloadInitialized);
+                        cmd.Parameters.AddWithValue("@HeaderLength", headerLength);
+                        cmd.Parameters.AddWithValue("@HeaderData", headerData);
+                        cmd.Parameters.AddWithValue("@HopLimit", hopLimit);
+                        cmd.Parameters.AddWithValue("@PayloadDataLength", payloadDataLength);
+                        cmd.Parameters.AddWithValue("@PayloadPacket", payloadPacket);
+                        cmd.Parameters.AddWithValue("@TimeToLive", timeToLive);
+                        cmd.Parameters.AddWithValue("@TotalLength", totalLength);
+                        cmd.Parameters.AddWithValue("@TotalPacketLength", totalPacketLength);
+                        cmd.Parameters.AddWithValue("@Version", version);
+                        cmd.Parameters.AddWithValue("@Organization", organization);
+                        cmd.Parameters.AddWithValue("@OrgName", orgName);
+                        cmd.Parameters.AddWithValue("@OrgId", orgId);
+                        cmd.Parameters.AddWithValue("@Address", address);
+                        cmd.Parameters.AddWithValue("@City", city);
+                        cmd.Parameters.AddWithValue("@StateProv", stateProv);
+                        cmd.Parameters.AddWithValue("@PostalCode", postalCode);
+                        cmd.Parameters.AddWithValue("@Country", country);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
         }
 
-
+        }
 
 
     }
