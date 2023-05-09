@@ -15,20 +15,21 @@ using System.Data.SqlClient;
 using System.Security.Cryptography;
 using PacketDotNet.Ieee80211;
 using System.Collections.Generic;
+using System.Data;
+using MaxMind.GeoIP2;
 //PREEETY MUCH TELL THIS APP TO IGNORE NOT PUTTING YOUR OWN IP RANGE AS BLANK AND NOT RUNNING THEM THROUGH THE INFORMATION FINDER
+//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
 namespace NetworkTrafficCSharpForm
 {
     public partial class Form1 : Form
     {
         SqlConnection connection = null;
         // Define your connection string to connect to your SQL Server database
-        string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\Source\\Repos\\DrNAMa\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True";
+        string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\Source\\Repos\\DrNAMa\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; 
 
         // Define the SQL query to insert the data into the database
         string query = "INSERT INTO IPLog (Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country, SourceIP, DestinationIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version) " +
                 "VALUES (@Organization, @OrgName, @OrgId, @Address, @City, @StateProv, @PostalCode, @Country, @SourceIP, @DestinationIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version)";
-
-
         // Import the kernel32.dll library
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -49,6 +50,7 @@ namespace NetworkTrafficCSharpForm
             // Test the console output
           //  Console.WriteLine("This is a test message");
         }
+
         private void Form1_Load(object sender, EventArgs e)
         {
            
@@ -72,6 +74,87 @@ namespace NetworkTrafficCSharpForm
                 IsolateData(text);
             }      
         }
+       
+        private void GetIPData2(string eyepee)
+        {
+            using (var reader = new DatabaseReader("C:\\Users\\holyh\\AppData\\Roaming\\Wireshark\\GeoLite2-City.mmdb"))
+            {
+              
+                try
+                {
+                    var response = reader.City(eyepee);
+                    Console.WriteLine(response.Country.IsoCode);
+                    Console.WriteLine(response.Country.Name);
+                //    Console.WriteLine(response.Country.Names.Keys);
+                    Console.WriteLine(response.Country.GeoNameId);
+                  //  Console.WriteLine(response.Country.Confidence.Value.ToString());
+                    Console.WriteLine(response.Country.IsInEuropeanUnion);
+                    Console.WriteLine(response.Continent.Name);
+                    Console.WriteLine(response.Continent.Code);
+                  //  Console.WriteLine(response.Continent.Names);
+                    Console.WriteLine(response.Continent.GeoNameId);
+                  //  Console.WriteLine(response.City.Name);
+                   // Console.WriteLine(response.City.Names.Values);
+                //    Console.WriteLine(response.City.GeoNameId);
+                 //   Console.WriteLine(response.City.Confidence.Value);
+               //     Console.WriteLine(response.MostSpecificSubdivision.Name);
+                 //   Console.WriteLine(response.MostSpecificSubdivision.Names.Values);
+                //    Console.WriteLine(response.MostSpecificSubdivision.GeoNameId);
+                 //   Console.WriteLine(response.MostSpecificSubdivision.Confidence.Value);
+                //    Console.WriteLine(response.Postal.Code);
+                 //   Console.WriteLine(response.Postal.Confidence.Value);
+            //        Console.WriteLine(response.RegisteredCountry.Name);
+                 //   Console.WriteLine(response.RegisteredCountry.Names.Values);
+               //     Console.WriteLine(response.RegisteredCountry.GeoNameId);
+                //    Console.WriteLine(response.RegisteredCountry.Confidence.Value);
+                //    Console.WriteLine(response.RegisteredCountry.IsInEuropeanUnion);
+             //       Console.WriteLine(response.RegisteredCountry.IsoCode);
+               //     Console.WriteLine(response.RepresentedCountry.Name);
+               //     Console.WriteLine(response.RepresentedCountry.Names.Values);
+               //     Console.WriteLine(response.RepresentedCountry.GeoNameId);
+                //    Console.WriteLine(response.RepresentedCountry.Confidence.Value);
+               //     Console.WriteLine(response.RepresentedCountry.IsInEuropeanUnion);
+               //     Console.WriteLine(response.RepresentedCountry.IsoCode);
+                //    Console.WriteLine(response.RepresentedCountry.Type);
+               //     Console.WriteLine(response.Subdivisions.Count);
+              //      Console.WriteLine(response.Traits.Isp);
+              //      Console.WriteLine(response.Traits.Domain);
+               //     Console.WriteLine(response.Traits.AutonomousSystemNumber);
+               //     Console.WriteLine(response.Traits.AutonomousSystemOrganization);
+               //     Console.WriteLine(response.Traits.ConnectionType);
+                    Console.WriteLine(response.Traits.IPAddress);
+                    Console.WriteLine(response.Traits.IsAnonymous);
+                    Console.WriteLine(response.Traits.IsAnonymousProxy);
+                    Console.WriteLine(response.Traits.IsAnonymousVpn);
+                    Console.WriteLine(response.Traits.IsHostingProvider);
+                    Console.WriteLine(response.Traits.IsLegitimateProxy);
+                    Console.WriteLine(response.Traits.IsPublicProxy);
+                    Console.WriteLine(response.Traits.IsResidentialProxy);
+                    Console.WriteLine(response.Traits.IsSatelliteProvider);
+                    Console.WriteLine(response.Traits.IsTorExitNode);
+                   // Console.WriteLine(response.Traits.MobileCountryCode);
+                    Console.WriteLine(response.Traits.Network);
+                //    Console.WriteLine(response.Traits.Organization);
+                //    Console.WriteLine(response.Traits.StaticIPScore);
+                //    Console.WriteLine(response.Traits.UserCount);
+                //    Console.WriteLine(response.Traits.UserType);
+                    Console.WriteLine(response.Location.HasCoordinates);
+                    Console.WriteLine(response.Location.TimeZone);                 
+                    Console.WriteLine(response.Location.AccuracyRadius);
+                //    Console.WriteLine(response.Location.AverageIncome);
+                    Console.WriteLine(response.Location.Latitude);
+                    Console.WriteLine(response.Location.Longitude);
+                //    Console.WriteLine(response.Location.MetroCode);
+                //    Console.WriteLine(response.Location.PopulationDensity);                    
+                }
+              
+                catch (Exception ex)
+                {
+                    GetIPData(eyepee);
+                }
+            }
+        }
+
         private List<String> carrylist = new List<string>();
         private void IsolateData(string derter)
         {
@@ -102,62 +185,35 @@ namespace NetworkTrafficCSharpForm
             // Check if the packet is an IP packet
             if (packet.PayloadPacket is IPPacket ipPacket)
             {
-
+                string sourceordest = string.Empty;
                 // Check if the packet is coming from or going to a computer on your network
                 if (ipPacket.DestinationAddress.ToString().StartsWith("192.168.1.") || ipPacket.SourceAddress.ToString().StartsWith("192.168.1."))
                 {
-                    
-     
-
                     if (!ipPacket.SourceAddress.ToString().StartsWith("192"))
                     {
-
                         using (SqlConnection connection = new SqlConnection(connectionString))
                         {
                             connection.Open();
-
                             // Create the SqlCommand object with the connection
                             SqlCommand cmd = new SqlCommand();
                             cmd.Connection = connection;
-
                             // Set the command text and parameters
                             cmd.CommandText = "SELECT COUNT(*) FROM IPLog WHERE SourceIP = @SourceIP";
                             // Add any necessary parameters
                             cmd.Parameters.AddWithValue("@SourceIP", ipPacket.SourceAddress.ToString());
                             // Execute the scalar query
                             int count = (int)cmd.ExecuteScalar();
+                            connection.Close();
+                            sourceordest = "source";
                             if (count == 0)
                             {
-                                GetIPData(ipPacket.SourceAddress.ToString());
+                              //  GetIPData(ipPacket.SourceAddress.ToString());
+                                GetIPData2(ipPacket.SourceAddress.ToString());
                             }
                         }
-                       
-
-
-                        // Check if the IP and company already exist in the database
-                        //   string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP OR DestIP = @DestIP OR Organization = @Organization";
-                        //  SqlCommand cmd = new SqlCommand(query, connection);
-
-                        //   int count = (int)cmd.ExecuteScalar();
-                        // If the IP  does not exist in the database, insert a new row
-
-
-
                     }
-                    else
+                    else if (!ipPacket.DestinationAddress.ToString().StartsWith("192"))
                     {
-                        //// Check if the IP and company already exist in the database
-                        //string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP";
-                        //SqlCommand cmd = new SqlCommand(query, connection);
-                        //cmd.Parameters.AddWithValue("@SourceIP", ipPacket.SourceAddress.ToString());
-                        //int count = (int)cmd.ExecuteScalar();
-                        //// If the IP  does not exist in the database, insert a new row
-                        //if (count == 0)
-                        //{
-
-
-
-
                         using (SqlConnection connection = new SqlConnection(connectionString))
                         {
                             connection.Open();
@@ -171,19 +227,16 @@ namespace NetworkTrafficCSharpForm
                             // Add any necessary parameters
                             cmd.Parameters.AddWithValue("@DestIP", ipPacket.DestinationAddress.ToString());
                             // Execute the scalar query
-                            int count = (int)cmd.ExecuteScalar();
-                            if (count == 0)
+                            int count1 = (int)cmd.ExecuteScalar();
+                            connection.Close();
+                            sourceordest = "dest";
+                            if (count1 == 0)
                             {
-                                GetIPData(ipPacket.DestinationAddress.ToString());
+                             //   GetIPData(ipPacket.DestinationAddress.ToString());
+                                GetIPData2(ipPacket.DestinationAddress.ToString());
                             }
                         }
-
-
-
-                        //  }
-
                     }
-           
 
                     // Display the source and destination IP addresses and the protocol of the captured packet
                     Console.WriteLine("Source IP: " + ipPacket.SourceAddress.ToString());
@@ -192,7 +245,7 @@ namespace NetworkTrafficCSharpForm
                     Console.WriteLine("Packet Size: " + ipPacket.Bytes.Length.ToString());
                     Console.WriteLine("Packet Color: " + ipPacket.Color.ToString());
                     Console.WriteLine("Has Payload Packet: " + ipPacket.HasPayloadPacket.ToString());
-                    Console.WriteLine("Has Payload Data: " + ipPacket.HasPayloadData.ToString());                    
+                    Console.WriteLine("Has Payload Data: " + ipPacket.HasPayloadData.ToString());
                     Console.WriteLine("Is Payload Initialized: " + ipPacket.IsPayloadInitialized.ToString());
                     Console.WriteLine("Header Length: " + ipPacket.HeaderLength.ToString());
                     Console.WriteLine("Header Data:");
@@ -202,17 +255,17 @@ namespace NetworkTrafficCSharpForm
                     }
                     Console.WriteLine();
                     Console.WriteLine("Hop Limit: " + ipPacket.HopLimit.ToString());
-                   // Console.WriteLine("Parent Packet: " + ipPacket.ParentPacket.ToString());
+                    // Console.WriteLine("Parent Packet: " + ipPacket.ParentPacket.ToString());
                     Console.WriteLine("Payload Data Length: " + ipPacket.PayloadLength.ToString());
                     bool yee = ipPacket.HasPayloadData;
-                    if (yee)                        
+                    if (yee)
                     {
                         Console.WriteLine("Payload Data:");
                         foreach (byte b in ipPacket.PayloadData)
                         {
                             Console.Write(b.ToString("X2") + " ");
                         }
-                       
+
                     }
                     Console.WriteLine("Payload Packet: " + ipPacket.PayloadPacket.ToString());
                     Console.WriteLine("TimeToLive: " + ipPacket.TimeToLive.ToString());
@@ -223,20 +276,25 @@ namespace NetworkTrafficCSharpForm
                     //  Console.WriteLine("Protocol: " + ipPacket.Bytes.Length.ToString());
                     if (carrylist.Count > 0)
                     {
-                        InsertPacketToDatabase(ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
+                        InsertPacketToDatabase(sourceordest, ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
                                              ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, ipPacket.HeaderData.ToString(),
                                              ipPacket.HopLimit, ipPacket.PayloadLength, ipPacket.PayloadPacket.ToString(), ipPacket.TimeToLive, ipPacket.TotalLength, ipPacket.TotalPacketLength,
                                              ipPacket.Version.ToString(), carrylist[0], carrylist[1], carrylist[2], carrylist[3], carrylist[4], carrylist[5], carrylist[6], carrylist[7]);
                     }
                     else
                     {
-                        InsertPacketToDatabase(ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
+                        InsertPacketToDatabase(sourceordest, ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
                                              ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, ipPacket.HeaderData.ToString(),
                                              ipPacket.HopLimit, ipPacket.PayloadLength, ipPacket.PayloadPacket.ToString(), ipPacket.TimeToLive, ipPacket.TotalLength, ipPacket.TotalPacketLength,
-                                             ipPacket.Version.ToString(), null,null,null,null,null,null,null,null);
-                    }                     
+                                             ipPacket.Version.ToString(), null, null, null, null, null, null, null, null);
+                    }
                     carrylist.Clear();
                 }
+                else
+                {
+                    Console.WriteLine("Stray Packet ALERT " + ipPacket.DestinationAddress + ":DestIP  &  SourceIP:" + ipPacket.SourceAddress.ToString());
+                }
+            
             }
         }
         private void BtnStartCapture_Click(object sender, EventArgs e)
@@ -247,7 +305,7 @@ namespace NetworkTrafficCSharpForm
                 var devices = CaptureDeviceList.Instance;
 
                 // Select the first available device 0 for W  2? for H
-                captureDevice = devices[2];
+                captureDevice = devices[0];
                 DeviceModes mode = DeviceModes.None;
                 int read_timeout = 1000;
                 var configuration = new DeviceConfiguration()
@@ -322,7 +380,7 @@ namespace NetworkTrafficCSharpForm
             Console.WriteLine("Destination MAC: {0}", header.DestinationMAC);
         }
 
-        private void InsertPacketToDatabase(string sourceIP, string destIP, string protocol, int packetSize, string packetColor, bool hasPayloadPacket, bool hasPayloadData, bool isPayloadInitialized, int headerLength, string headerData, int hopLimit, int payloadDataLength, string payloadPacket, int timeToLive, int totalLength, int totalPacketLength, string version, string organization, string orgName, string orgId, string address, string city, string stateProv, string postalCode, string country)
+        private void InsertPacketToDatabase(string sourceordest, string sourceIP, string destIP, string protocol, int packetSize, string packetColor, bool hasPayloadPacket, bool hasPayloadData, bool isPayloadInitialized, int headerLength, string headerData, int hopLimit, int payloadDataLength, string payloadPacket, int timeToLive, int totalLength, int totalPacketLength, string version, string organization, string orgName, string orgId, string address, string city, string stateProv, string postalCode, string country)
         {
 
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -332,17 +390,22 @@ namespace NetworkTrafficCSharpForm
                 // Create the SqlCommand object with the connection
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = connection;
-
-                // Set the command text and parameters
-                cmd.CommandText = "SELECT COUNT(*) FROM IPLog WHERE SourceIP = @SourceIP";
-                // Add any necessary parameters
-                cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
-                
+                if (sourceordest == "source")
+                {
+                    // Set the command text and parameters
+                    cmd.CommandText = "SELECT COUNT(*) FROM IPLog WHERE SourceIP = @SourceIP";
+                    // Add any necessary parameters
+                    cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
+                }
+                else
+                {
+                    // Set the command text and parameters
+                    cmd.CommandText = "SELECT COUNT(*) FROM IPLog WHERE DestIP = @DestIP";
+                    // Add any necessary parameters
+                    cmd.Parameters.AddWithValue("@DestIP", destIP);
+                }
                 // Execute the scalar query
                 int count = (int)cmd.ExecuteScalar();
-
-
-
 
                 // Check if the IP and company already exist in the database
                 // string query = "SELECT COUNT(*) FROM Packets WHERE SourceIP = @SourceIP OR DestIP = @DestIP";
@@ -409,11 +472,21 @@ namespace NetworkTrafficCSharpForm
                         cmd.ExecuteNonQuery();
                     }
                 }
+            }
         }
 
+        private void buttviewpackets_Click(object sender, EventArgs e)
+        {
+            panel1.Visible = true;
+            //string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //
+            SqlConnection connection = new SqlConnection(connectionString);
+            string query = "SELECT * FROM IPLog";
+            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
+            DataTable dataTable = new DataTable();
+            adapter.Fill(dataTable);
+            dataGridView1.DataSource = dataTable;
+
         }
-
-
     }
     class EthernetHeader
     {
