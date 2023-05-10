@@ -77,7 +77,7 @@
             this.buttviewpackets.TabIndex = 3;
             this.buttviewpackets.Text = "View Packets";
             this.buttviewpackets.UseVisualStyleBackColor = true;
-            this.buttviewpackets.Click += new System.EventHandler(this.buttviewpackets_Click);
+            this.buttviewpackets.Click += new System.EventHandler(this.Buttviewpackets_Click);
             // 
             // panel1
             // 

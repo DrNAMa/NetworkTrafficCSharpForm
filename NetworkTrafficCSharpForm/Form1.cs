@@ -16,7 +16,9 @@ using System.Security.Cryptography;
 using PacketDotNet.Ieee80211;
 using System.Collections.Generic;
 using System.Data;
-using MaxMind.GeoIP2;
+using System.Diagnostics;
+using static NetworkTrafficCSharpForm.Form1;
+//using MaxMind.GeoIP2;
 //PREEETY MUCH TELL THIS APP TO IGNORE NOT PUTTING YOUR OWN IP RANGE AS BLANK AND NOT RUNNING THEM THROUGH THE INFORMATION FINDER
 //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
 namespace NetworkTrafficCSharpForm
@@ -25,7 +27,7 @@ namespace NetworkTrafficCSharpForm
     {
         SqlConnection connection = null;
         // Define your connection string to connect to your SQL Server database
-        string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\Source\\Repos\\DrNAMa\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; 
+        string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\Source\\Repos\\DrNAMa\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True";  // "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; 
 
         // Define the SQL query to insert the data into the database
         string query = "INSERT INTO IPLog (Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country, SourceIP, DestinationIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version) " +
@@ -36,6 +38,44 @@ namespace NetworkTrafficCSharpForm
         static extern bool AllocConsole();
 
         private ICaptureDevice captureDevice;
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MIB_TCPROW_OWNER_PID
+        {
+            public uint dwState;
+            public uint dwLocalAddr;
+            public uint dwLocalPort;
+            public uint dwRemoteAddr;
+            public uint dwRemotePort;
+            public uint dwOwningPid;
+        }
+
+        [DllImport("iphlpapi.dll")]
+        public static extern int GetExtendedTcpTable(IntPtr pTcpTable, ref int pdwSize, bool bOrder, int ulAf, TcpTableClass tableClass, uint reserved = 0);
+
+        public enum TcpTableClass
+        {
+            TCP_TABLE_OWNER_PID_ALL
+        }
+        //public enum TCP_TABLE_CLASS : int
+        //{
+        //    TCP_TABLE_BASIC_LISTENER,
+        //    TCP_TABLE_BASIC_CONNECTIONS,
+        //    TCP_TABLE_BASIC_ALL,
+        //    TCP_TABLE_OWNER_PID_LISTENER,
+        //    TCP_TABLE_OWNER_PID_CONNECTIONS,
+        //    TCP_TABLE_OWNER_PID_ALL,
+        //    TCP_TABLE_OWNER_MODULE_LISTENER,
+        //    TCP_TABLE_OWNER_MODULE_CONNECTIONS,
+        //    TCP_TABLE_OWNER_MODULE_ALL
+        //}
+
+        [DllImport("iphlpapi.dll")]
+        public static extern int GetExtendedUdpTable(IntPtr pUdpTable, ref int pdwSize, bool bOrder, int ulAf, UdpTableClass tableClass, uint reserved = 0);
+
+        public enum UdpTableClass
+        {
+            UDP_TABLE_OWNER_PID
+        }
         public Form1()
         {
             InitializeComponent();
@@ -55,6 +95,18 @@ namespace NetworkTrafficCSharpForm
         {
            
         }
+        private void Buttviewpackets_Click(object sender, EventArgs e)
+        {
+            panel1.Visible = true;
+            //string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //
+            SqlConnection connection = new SqlConnection(connectionString);
+            string query = "SELECT * FROM IPLog";
+            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
+            DataTable dataTable = new DataTable();
+            adapter.Fill(dataTable);
+            dataGridView1.DataSource = dataTable;
+
+        }
         private void GetIPData(string eyepee, int port)
         {
             // URL of the webpage to scrape
@@ -73,7 +125,7 @@ namespace NetworkTrafficCSharpForm
             {
                 IsolateData(text);
             }
-           int jamimah =  GetProcessId(eyepee, port);
+           int jamimah = GetProcessIdOrFileName(eyepee, port);
         }
        
       
@@ -99,6 +151,7 @@ namespace NetworkTrafficCSharpForm
                 }
             }
         }
+
         private void OnPacketArrival(object sender, PacketCapture e)
         {
             // Get the captured packet
@@ -133,7 +186,7 @@ namespace NetworkTrafficCSharpForm
                                 int sourceport = 0;
                                if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
                                 {
-                                    sourceport = tcpPacket.SourcePort;
+                                    sourceport = tcpPacket.SourcePort;                                    
                                 }
                                 if (ipPacket.PayloadPacket is UdpPacket updPacket)
                                 {
@@ -238,6 +291,151 @@ namespace NetworkTrafficCSharpForm
             
             }
         }
+
+        //    int GetProcessIdOrFileName(string sourceIp, int sourcePort)
+        //    {
+        //    IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Parse(sourceIp), sourcePort);
+
+        //    int bufferSize = 0;
+        //    GetExtendedTcpTable(IntPtr.Zero, ref bufferSize, true, 2, TcpTableClass.TCP_TABLE_OWNER_PID_ALL);
+        //    IntPtr tcpTable = Marshal.AllocHGlobal(bufferSize);
+
+        //    try
+        //    {
+        //        int result = GetExtendedTcpTable(tcpTable, ref bufferSize, true, 2, TcpTableClass.TCP_TABLE_OWNER_PID_ALL);
+        //        if (result == 0)
+        //        {
+        //            int rowCount = Marshal.ReadInt32(tcpTable);
+        //            IntPtr rowPtr = IntPtr.Add(tcpTable, 4);
+
+        //            for (int i = 0; i < rowCount; i++)
+        //            {
+        //                MIB_TCPROW_OWNER_PID tcpRow = Marshal.PtrToStructure<MIB_TCPROW_OWNER_PID>(rowPtr);
+
+        //                int port = (int)(((tcpRow.dwLocalPort & 0xFF00) >> 8) | ((tcpRow.dwLocalPort & 0x00FF) << 8));
+        //                byte[] ipAddressBytes = BitConverter.GetBytes(tcpRow.dwLocalAddr);
+        //               // Array.Reverse(ipAddressBytes);
+        //                    // Assuming ipAddressBytes is the byte array representing the IP address
+        //                    //if (BitConverter.IsLittleEndian)
+        //                    //{
+        //                    //    // Reverse the byte order if the system is little-endian
+        //                    //    Array.Reverse(ipAddressBytes);
+        //                    //}
+
+        //                 //   IPAddress localIpAddress = new IPAddress(ipAddressBytes);
+
+        //                    IPAddress localIpAddress = new IPAddress(ipAddressBytes);
+        //                IPEndPoint localEndPoint = new IPEndPoint(localIpAddress.MapToIPv4(), port);
+
+        //                    if (localIpAddress.Equals(localEndpoint.Address) && port == localEndpoint.Port)
+        //                    {
+        //                    int processId = (int)tcpRow.dwOwningPid;
+
+        //                    Process process;
+        //                    try
+        //                    {
+        //                        process = Process.GetProcessById(processId);
+        //                    }
+        //                    catch (ArgumentException)
+        //                    {
+        //                        // Process with the given ID does not exist
+        //                        return -1;
+        //                    }
+
+        //                    string processFileName = process.MainModule.FileName;
+        //                    // Alternatively, you can use process.ProcessName to get the process name without the file path.
+
+        //                    Console.WriteLine($"Process ID: {processId}");
+        //                    Console.WriteLine($"Process File Name: {processFileName}");
+
+        //                    return processId;
+        //                }
+
+        //                rowPtr = IntPtr.Add(rowPtr, Marshal.SizeOf(tcpRow));
+        //            }
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        Marshal.FreeHGlobal(tcpTable);
+        //    }
+
+        //    return -1; // Process ID not found
+        //}
+
+int GetProcessIdOrFileName(string sourceIp, int sourcePort)
+    {
+        IPAddress localIpAddress = IPAddress.Parse(sourceIp);
+        ushort localPort = (ushort)sourcePort;
+
+        int bufferSize = 0;
+        GetExtendedTcpTable(IntPtr.Zero, ref bufferSize, true, 2, TcpTableClass.TCP_TABLE_OWNER_PID_ALL);
+        IntPtr tcpTable = Marshal.AllocHGlobal(bufferSize);
+
+        try
+        {
+            int result = GetExtendedTcpTable(tcpTable, ref bufferSize, true, 2, TcpTableClass.TCP_TABLE_OWNER_PID_ALL);
+            if (result == 0)
+            {
+                int rowCount = Marshal.ReadInt32(tcpTable);
+                IntPtr rowPtr = IntPtr.Add(tcpTable, 4);
+
+                for (int i = 0; i < rowCount; i++)
+                {
+                        MIB_TCPROW_OWNER_PID tcpRow = Marshal.PtrToStructure<MIB_TCPROW_OWNER_PID>(rowPtr);
+
+                        ushort port = (ushort)(((tcpRow.dwLocalPort & 0xFF00) >> 8) | ((tcpRow.dwLocalPort & 0x00FF) << 8));
+                        byte[] ipAddressBytes = BitConverter.GetBytes(tcpRow.dwLocalAddr);
+                        Array.Reverse(ipAddressBytes); // Reverse the byte order
+                        IPAddress rowIpAddress = new IPAddress(ipAddressBytes);
+                        IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse(sourceIp), sourcePort);
+                        IPEndPoint rowEndPoint = new IPEndPoint(rowIpAddress, port);
+
+                        if (localEndPoint.Equals(rowIpAddress))
+                        {
+                        int processId = (int)tcpRow.dwOwningPid;
+
+                        try
+                        {
+                            Process process = Process.GetProcessById(processId);
+                            string processFileName = process.MainModule.FileName;
+                            // Alternatively, you can use process.ProcessName to get the process name without the file path.
+
+                            Console.WriteLine($"Process ID: {processId}");
+                            Console.WriteLine($"Process File Name: {processFileName}");
+
+                            return processId;
+                        }
+                        catch (ArgumentException)
+                        {
+                            // Process with the given ID does not exist
+                            return -1;
+                        }
+                    }
+
+                    rowPtr = IntPtr.Add(rowPtr, Marshal.SizeOf(tcpRow));
+                }
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(tcpTable);
+        }
+
+        return -1; // Process ID not found
+    }
+
+
+    int GetProcessIdByHandle(string handle)
+        {
+            int processId = -1;
+            string[] parts = handle.Split(':');
+            if (parts.Length == 2 && int.TryParse(parts[0], out processId))
+            {
+                return processId;
+            }
+            return -1;
+        }
         private void BtnStartCapture_Click(object sender, EventArgs e)
         {
             try
@@ -246,7 +444,7 @@ namespace NetworkTrafficCSharpForm
                 var devices = CaptureDeviceList.Instance;
 
                 // Select the first available device 0 for W  2? for H
-                captureDevice = devices[0];
+                captureDevice = devices[2];
                 DeviceModes mode = DeviceModes.None;
                 int read_timeout = 1000;
                 var configuration = new DeviceConfiguration()
@@ -416,45 +614,9 @@ namespace NetworkTrafficCSharpForm
             }
         }
 
-        private void buttviewpackets_Click(object sender, EventArgs e)
-        {
-            panel1.Visible = true;
-            //string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //
-            SqlConnection connection = new SqlConnection(connectionString);
-            string query = "SELECT * FROM IPLog";
-            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-            DataTable dataTable = new DataTable();
-            adapter.Fill(dataTable);
-            dataGridView1.DataSource = dataTable;
+      
 
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MIB_TCPROW_OWNER_PID
-        {
-            public uint dwState;
-            public uint dwLocalAddr;
-            public uint dwLocalPort;
-            public uint dwRemoteAddr;
-            public uint dwRemotePort;
-            public uint dwOwningPid;
-        }
-
-        [DllImport("iphlpapi.dll")]
-        public static extern int GetExtendedTcpTable(IntPtr pTcpTable, ref int pdwSize, bool bOrder, int ulAf, TcpTableClass tableClass, uint reserved = 0);
-
-        public enum TcpTableClass
-        {
-            TCP_TABLE_OWNER_PID_ALL
-        }
-
-        [DllImport("iphlpapi.dll")]
-        public static extern int GetExtendedUdpTable(IntPtr pUdpTable, ref int pdwSize, bool bOrder, int ulAf, UdpTableClass tableClass, uint reserved = 0);
-
-        public enum UdpTableClass
-        {
-            UDP_TABLE_OWNER_PID
-        }
+      
         static int GetProcessId(string sourceIp, int sourcePort)
         {
             IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Parse(sourceIp), sourcePort);
