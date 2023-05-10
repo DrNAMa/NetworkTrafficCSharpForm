@@ -475,7 +475,12 @@ namespace NetworkTrafficCSharpForm
                     {
                         MIB_TCPROW_OWNER_PID tcpRow = Marshal.PtrToStructure<MIB_TCPROW_OWNER_PID>(rowPtr);
 
-                        IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse(FormatIPv4Address(tcpRow.dwLocalAddr)), (int)tcpRow.dwLocalPort);
+                        int port = (int)(((tcpRow.dwLocalPort & 0xFF00) >> 8) | ((tcpRow.dwLocalPort & 0x00FF) << 8));
+                        IPEndPoint localEndPoint = new IPEndPoint(new IPAddress(tcpRow.dwLocalAddr), port);
+
+
+
+
 
 
 
@@ -513,6 +518,11 @@ namespace NetworkTrafficCSharpForm
 
             return new IPAddress(bytes).ToString();
         }
+        private static ushort ReverseBytes(ushort value)
+        {
+            return (ushort)((value >> 8) | (value << 8));
+        }
+
 
 
     }
