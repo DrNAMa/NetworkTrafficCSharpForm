@@ -55,7 +55,7 @@ namespace NetworkTrafficCSharpForm
         {
            
         }
-        private void GetIPData(string eyepee)
+        private void GetIPData(string eyepee, int port)
         {
             // URL of the webpage to scrape
             string url = "https://www.whois.com/whois/" + eyepee;
@@ -72,88 +72,11 @@ namespace NetworkTrafficCSharpForm
             if (text != null)
             {
                 IsolateData(text);
-            }      
+            }
+           int jamimah =  GetProcessId(eyepee, port);
         }
        
-        private void GetIPData2(string eyepee)
-        {
-            using (var reader = new DatabaseReader("C:\\Users\\holyh\\AppData\\Roaming\\Wireshark\\GeoLite2-City.mmdb"))
-            {
-              
-                try
-                {
-                    var response = reader.City(eyepee);
-                    Console.WriteLine(response.Country.IsoCode);
-                    Console.WriteLine(response.Country.Name);
-                //    Console.WriteLine(response.Country.Names.Keys);
-                    Console.WriteLine(response.Country.GeoNameId);
-                  //  Console.WriteLine(response.Country.Confidence.Value.ToString());
-                    Console.WriteLine(response.Country.IsInEuropeanUnion);
-                    Console.WriteLine(response.Continent.Name);
-                    Console.WriteLine(response.Continent.Code);
-                  //  Console.WriteLine(response.Continent.Names);
-                    Console.WriteLine(response.Continent.GeoNameId);
-                  //  Console.WriteLine(response.City.Name);
-                   // Console.WriteLine(response.City.Names.Values);
-                //    Console.WriteLine(response.City.GeoNameId);
-                 //   Console.WriteLine(response.City.Confidence.Value);
-               //     Console.WriteLine(response.MostSpecificSubdivision.Name);
-                 //   Console.WriteLine(response.MostSpecificSubdivision.Names.Values);
-                //    Console.WriteLine(response.MostSpecificSubdivision.GeoNameId);
-                 //   Console.WriteLine(response.MostSpecificSubdivision.Confidence.Value);
-                //    Console.WriteLine(response.Postal.Code);
-                 //   Console.WriteLine(response.Postal.Confidence.Value);
-            //        Console.WriteLine(response.RegisteredCountry.Name);
-                 //   Console.WriteLine(response.RegisteredCountry.Names.Values);
-               //     Console.WriteLine(response.RegisteredCountry.GeoNameId);
-                //    Console.WriteLine(response.RegisteredCountry.Confidence.Value);
-                //    Console.WriteLine(response.RegisteredCountry.IsInEuropeanUnion);
-             //       Console.WriteLine(response.RegisteredCountry.IsoCode);
-               //     Console.WriteLine(response.RepresentedCountry.Name);
-               //     Console.WriteLine(response.RepresentedCountry.Names.Values);
-               //     Console.WriteLine(response.RepresentedCountry.GeoNameId);
-                //    Console.WriteLine(response.RepresentedCountry.Confidence.Value);
-               //     Console.WriteLine(response.RepresentedCountry.IsInEuropeanUnion);
-               //     Console.WriteLine(response.RepresentedCountry.IsoCode);
-                //    Console.WriteLine(response.RepresentedCountry.Type);
-               //     Console.WriteLine(response.Subdivisions.Count);
-              //      Console.WriteLine(response.Traits.Isp);
-              //      Console.WriteLine(response.Traits.Domain);
-               //     Console.WriteLine(response.Traits.AutonomousSystemNumber);
-               //     Console.WriteLine(response.Traits.AutonomousSystemOrganization);
-               //     Console.WriteLine(response.Traits.ConnectionType);
-                    Console.WriteLine(response.Traits.IPAddress);
-                    Console.WriteLine(response.Traits.IsAnonymous);
-                    Console.WriteLine(response.Traits.IsAnonymousProxy);
-                    Console.WriteLine(response.Traits.IsAnonymousVpn);
-                    Console.WriteLine(response.Traits.IsHostingProvider);
-                    Console.WriteLine(response.Traits.IsLegitimateProxy);
-                    Console.WriteLine(response.Traits.IsPublicProxy);
-                    Console.WriteLine(response.Traits.IsResidentialProxy);
-                    Console.WriteLine(response.Traits.IsSatelliteProvider);
-                    Console.WriteLine(response.Traits.IsTorExitNode);
-                   // Console.WriteLine(response.Traits.MobileCountryCode);
-                    Console.WriteLine(response.Traits.Network);
-                //    Console.WriteLine(response.Traits.Organization);
-                //    Console.WriteLine(response.Traits.StaticIPScore);
-                //    Console.WriteLine(response.Traits.UserCount);
-                //    Console.WriteLine(response.Traits.UserType);
-                    Console.WriteLine(response.Location.HasCoordinates);
-                    Console.WriteLine(response.Location.TimeZone);                 
-                    Console.WriteLine(response.Location.AccuracyRadius);
-                //    Console.WriteLine(response.Location.AverageIncome);
-                    Console.WriteLine(response.Location.Latitude);
-                    Console.WriteLine(response.Location.Longitude);
-                //    Console.WriteLine(response.Location.MetroCode);
-                //    Console.WriteLine(response.Location.PopulationDensity);                    
-                }
-              
-                catch (Exception ex)
-                {
-                    GetIPData(eyepee);
-                }
-            }
-        }
+      
 
         private List<String> carrylist = new List<string>();
         private void IsolateData(string derter)
@@ -207,8 +130,17 @@ namespace NetworkTrafficCSharpForm
                             sourceordest = "source";
                             if (count == 0)
                             {
-                              //  GetIPData(ipPacket.SourceAddress.ToString());
-                                GetIPData2(ipPacket.SourceAddress.ToString());
+                                int sourceport = 0;
+                               if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
+                                {
+                                    sourceport = tcpPacket.SourcePort;
+                                }
+                                if (ipPacket.PayloadPacket is UdpPacket updPacket)
+                                {
+                                    sourceport = updPacket.SourcePort;
+                                }
+                                GetIPData(ipPacket.SourceAddress.ToString(), sourceport);
+                              //  GetIPData2(ipPacket.SourceAddress.ToString());
                             }
                         }
                     }
@@ -232,8 +164,17 @@ namespace NetworkTrafficCSharpForm
                             sourceordest = "dest";
                             if (count1 == 0)
                             {
-                             //   GetIPData(ipPacket.DestinationAddress.ToString());
-                                GetIPData2(ipPacket.DestinationAddress.ToString());
+                                int destport = 0;
+                                if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
+                                {
+                                    destport = tcpPacket.DestinationPort;
+                                }
+                                if (ipPacket.PayloadPacket is UdpPacket updPacket)
+                                {
+                                    destport = updPacket.DestinationPort;
+                                }
+                                GetIPData(ipPacket.DestinationAddress.ToString(), destport);
+                             //   GetIPData2(ipPacket.DestinationAddress.ToString());
                             }
                         }
                     }
@@ -487,6 +428,93 @@ namespace NetworkTrafficCSharpForm
             dataGridView1.DataSource = dataTable;
 
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MIB_TCPROW_OWNER_PID
+        {
+            public uint dwState;
+            public uint dwLocalAddr;
+            public uint dwLocalPort;
+            public uint dwRemoteAddr;
+            public uint dwRemotePort;
+            public uint dwOwningPid;
+        }
+
+        [DllImport("iphlpapi.dll")]
+        public static extern int GetExtendedTcpTable(IntPtr pTcpTable, ref int pdwSize, bool bOrder, int ulAf, TcpTableClass tableClass, uint reserved = 0);
+
+        public enum TcpTableClass
+        {
+            TCP_TABLE_OWNER_PID_ALL
+        }
+
+        [DllImport("iphlpapi.dll")]
+        public static extern int GetExtendedUdpTable(IntPtr pUdpTable, ref int pdwSize, bool bOrder, int ulAf, UdpTableClass tableClass, uint reserved = 0);
+
+        public enum UdpTableClass
+        {
+            UDP_TABLE_OWNER_PID
+        }
+        static int GetProcessId(string sourceIp, int sourcePort)
+        {
+            IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Parse(sourceIp), sourcePort);
+
+            int bufferSize = 0;
+            GetExtendedTcpTable(IntPtr.Zero, ref bufferSize, true, 2, TcpTableClass.TCP_TABLE_OWNER_PID_ALL);
+            IntPtr tcpTable = Marshal.AllocHGlobal(bufferSize);
+
+            try
+            {
+                int result = GetExtendedTcpTable(tcpTable, ref bufferSize, true, 2, TcpTableClass.TCP_TABLE_OWNER_PID_ALL);
+                if (result == 0)
+                {
+                    int rowCount = Marshal.ReadInt32(tcpTable);
+                    IntPtr rowPtr = IntPtr.Add(tcpTable, 4);
+
+                    for (int i = 0; i < rowCount; i++)
+                    {
+                        MIB_TCPROW_OWNER_PID tcpRow = Marshal.PtrToStructure<MIB_TCPROW_OWNER_PID>(rowPtr);
+
+                        IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse(FormatIPv4Address(tcpRow.dwLocalAddr)), (int)tcpRow.dwLocalPort);
+
+
+
+
+
+
+
+
+
+                        if (localEndPoint.Equals(localEndpoint))
+                        {
+                            return (int)tcpRow.dwOwningPid;
+                        }
+
+                        rowPtr = IntPtr.Add(rowPtr, Marshal.SizeOf(tcpRow));
+                    }
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(tcpTable);
+            }
+
+            return -1; // Process ID not found
+        }
+        //private static string FormatIPv4Address(uint address)
+        //{
+        //    byte[] bytes = BitConverter.GetBytes(address);
+        //    return new IPAddress(bytes).ToString();
+        //}  
+        private static string FormatIPv4Address(uint address)
+        {
+            byte[] bytes = BitConverter.GetBytes(address);
+            Array.Reverse(bytes); // Reverse the byte order to little-endian
+
+            return new IPAddress(bytes).ToString();
+        }
+
+
     }
     class EthernetHeader
     {
@@ -494,3 +522,84 @@ namespace NetworkTrafficCSharpForm
         public string SourceMAC { get; set; }
     }
 }
+
+//MAXMIND API METHOD
+//private void GetIPData2(string eyepee)
+//{
+//    using (var reader = new DatabaseReader("C:\\Users\\holyh\\AppData\\Roaming\\Wireshark\\GeoLite2-City.mmdb"))
+//    {
+
+//        try
+//        {
+//            var response = reader.City(eyepee);
+//            Console.WriteLine(response.Country.IsoCode);
+//            Console.WriteLine(response.Country.Name);
+//        //    Console.WriteLine(response.Country.Names.Keys);
+//            Console.WriteLine(response.Country.GeoNameId);
+//          //  Console.WriteLine(response.Country.Confidence.Value.ToString());
+//            Console.WriteLine(response.Country.IsInEuropeanUnion);
+//            Console.WriteLine(response.Continent.Name);
+//            Console.WriteLine(response.Continent.Code);
+//          //  Console.WriteLine(response.Continent.Names);
+//            Console.WriteLine(response.Continent.GeoNameId);
+//          //  Console.WriteLine(response.City.Name);
+//           // Console.WriteLine(response.City.Names.Values);
+//        //    Console.WriteLine(response.City.GeoNameId);
+//         //   Console.WriteLine(response.City.Confidence.Value);
+//       //     Console.WriteLine(response.MostSpecificSubdivision.Name);
+//         //   Console.WriteLine(response.MostSpecificSubdivision.Names.Values);
+//        //    Console.WriteLine(response.MostSpecificSubdivision.GeoNameId);
+//         //   Console.WriteLine(response.MostSpecificSubdivision.Confidence.Value);
+//        //    Console.WriteLine(response.Postal.Code);
+//         //   Console.WriteLine(response.Postal.Confidence.Value);
+//    //        Console.WriteLine(response.RegisteredCountry.Name);
+//         //   Console.WriteLine(response.RegisteredCountry.Names.Values);
+//       //     Console.WriteLine(response.RegisteredCountry.GeoNameId);
+//        //    Console.WriteLine(response.RegisteredCountry.Confidence.Value);
+//        //    Console.WriteLine(response.RegisteredCountry.IsInEuropeanUnion);
+//     //       Console.WriteLine(response.RegisteredCountry.IsoCode);
+//       //     Console.WriteLine(response.RepresentedCountry.Name);
+//       //     Console.WriteLine(response.RepresentedCountry.Names.Values);
+//       //     Console.WriteLine(response.RepresentedCountry.GeoNameId);
+//        //    Console.WriteLine(response.RepresentedCountry.Confidence.Value);
+//       //     Console.WriteLine(response.RepresentedCountry.IsInEuropeanUnion);
+//       //     Console.WriteLine(response.RepresentedCountry.IsoCode);
+//        //    Console.WriteLine(response.RepresentedCountry.Type);
+//       //     Console.WriteLine(response.Subdivisions.Count);
+//      //      Console.WriteLine(response.Traits.Isp);
+//      //      Console.WriteLine(response.Traits.Domain);
+//       //     Console.WriteLine(response.Traits.AutonomousSystemNumber);
+//       //     Console.WriteLine(response.Traits.AutonomousSystemOrganization);
+//       //     Console.WriteLine(response.Traits.ConnectionType);
+//            Console.WriteLine(response.Traits.IPAddress);
+//            Console.WriteLine(response.Traits.IsAnonymous);
+//            Console.WriteLine(response.Traits.IsAnonymousProxy);
+//            Console.WriteLine(response.Traits.IsAnonymousVpn);
+//            Console.WriteLine(response.Traits.IsHostingProvider);
+//            Console.WriteLine(response.Traits.IsLegitimateProxy);
+//            Console.WriteLine(response.Traits.IsPublicProxy);
+//            Console.WriteLine(response.Traits.IsResidentialProxy);
+//            Console.WriteLine(response.Traits.IsSatelliteProvider);
+//            Console.WriteLine(response.Traits.IsTorExitNode);
+//           // Console.WriteLine(response.Traits.MobileCountryCode);
+//            Console.WriteLine(response.Traits.Network);
+//        //    Console.WriteLine(response.Traits.Organization);
+//        //    Console.WriteLine(response.Traits.StaticIPScore);
+//        //    Console.WriteLine(response.Traits.UserCount);
+//        //    Console.WriteLine(response.Traits.UserType);
+//            Console.WriteLine(response.Location.HasCoordinates);
+//            Console.WriteLine(response.Location.TimeZone);                 
+//            Console.WriteLine(response.Location.AccuracyRadius);
+//        //    Console.WriteLine(response.Location.AverageIncome);
+//            Console.WriteLine(response.Location.Latitude);
+//            Console.WriteLine(response.Location.Longitude);
+//        //    Console.WriteLine(response.Location.MetroCode);
+//        //    Console.WriteLine(response.Location.PopulationDensity);                    
+//        }
+
+//        catch (Exception ex)
+//        {
+//            GetIPData(eyepee);
+//        }
+//    }
+//}
