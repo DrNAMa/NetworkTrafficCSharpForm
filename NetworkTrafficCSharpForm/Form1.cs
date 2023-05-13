@@ -28,7 +28,7 @@ namespace NetworkTrafficCSharpForm
 {
     public partial class Form1 : Form
     {
-        SqlConnection connection = null;
+      //  SqlConnection connection = null;
         // Define your connection string to connect to your SQL Server database  111
         string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\Source\\Repos\\DrNAMa\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True";
 
@@ -113,7 +113,7 @@ namespace NetworkTrafficCSharpForm
             int lastSpaceIndex = netstatOutput.LastIndexOf(' '); // Find the index of the last space
             string lastWord = netstatOutput.Substring(lastSpaceIndex + 1); // Extract the substring starting from the index after the last space
             int[] yee = { 0 };
-            bool isNumeric = int.TryParse(lastWord, out int intValue);
+            bool isNumeric = int.TryParse(lastWord, out _);
             if (isNumeric)
             {
                 int geeze = int.Parse(lastWord);
@@ -175,7 +175,7 @@ namespace NetworkTrafficCSharpForm
             dataGridView1.DataSource = dataTable;
 
         }
-        private void GetIPData(string eyepee, int port)
+        private void GetIPData(string eyepee)
         {
             // URL of the webpage to scrape
             string url = "https://www.whois.com/whois/" + eyepee;
@@ -238,10 +238,12 @@ namespace NetworkTrafficCSharpForm
                         {
                             connection.Open();
                             // Create the SqlCommand object with the connection
-                            SqlCommand cmd = new SqlCommand();
-                            cmd.Connection = connection;
-                            // Set the command text and parameters
-                            cmd.CommandText = "SELECT COUNT(*) FROM IPLog WHERE SourceIP = @SourceIP";
+                            SqlCommand cmd = new SqlCommand
+                            {
+                                Connection = connection,
+                                // Set the command text and parameters
+                                CommandText = "SELECT COUNT(*) FROM IPLog WHERE SourceIP = @SourceIP"
+                            };
                             // Add any necessary parameters
                             cmd.Parameters.AddWithValue("@SourceIP", ipPacket.SourceAddress.ToString());
                             // Execute the scalar query
@@ -250,16 +252,15 @@ namespace NetworkTrafficCSharpForm
                             sourceordest = "source";
                             if (count == 0)
                             {
-                                int sourceport = 0;
-                               if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
+                                if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
                                 {
-                                    sourceport = tcpPacket.SourcePort;                                    
+                                    _ = tcpPacket.SourcePort;                                    
                                 }
                                 if (ipPacket.PayloadPacket is UdpPacket updPacket)
                                 {
-                                    sourceport = updPacket.SourcePort;
+                                    _ = updPacket.SourcePort;
                                 }
-                                GetIPData(ipPacket.SourceAddress.ToString(), sourceport);
+                                GetIPData(ipPacket.SourceAddress.ToString());
 
                                // YaMum(sourceport);
 
@@ -282,11 +283,13 @@ namespace NetworkTrafficCSharpForm
                             connection.Open();
 
                             // Create the SqlCommand object with the connection
-                            SqlCommand cmd = new SqlCommand();
-                            cmd.Connection = connection;
+                            SqlCommand cmd = new SqlCommand
+                            {
+                                Connection = connection,
 
-                            // Set the command text and parameters
-                            cmd.CommandText = "SELECT COUNT(*) FROM IPLog WHERE DestIP = @DestIP";
+                                // Set the command text and parameters
+                                CommandText = "SELECT COUNT(*) FROM IPLog WHERE DestIP = @DestIP"
+                            };
                             // Add any necessary parameters
                             cmd.Parameters.AddWithValue("@DestIP", ipPacket.DestinationAddress.ToString());
                             // Execute the scalar query
@@ -295,16 +298,15 @@ namespace NetworkTrafficCSharpForm
                             sourceordest = "dest";
                             if (count1 == 0)
                             {
-                                int destport = 0;
                                 if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
                                 {
-                                    destport = tcpPacket.DestinationPort;
+                                    _ = tcpPacket.DestinationPort;
                                 }
                                 if (ipPacket.PayloadPacket is UdpPacket updPacket)
                                 {
-                                    destport = updPacket.DestinationPort;
+                                    _ = updPacket.DestinationPort;
                                 }
-                                GetIPData(ipPacket.DestinationAddress.ToString(), destport);
+                                GetIPData(ipPacket.DestinationAddress.ToString());
 
 
                               //  YaMum(destport);
@@ -587,8 +589,10 @@ namespace NetworkTrafficCSharpForm
                 connection.Open();
 
                 // Create the SqlCommand object with the connection
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = connection;
+                SqlCommand cmd = new SqlCommand
+                {
+                    Connection = connection
+                };
                 if (sourceordest == "source")
                 {
                     // Set the command text and parameters
