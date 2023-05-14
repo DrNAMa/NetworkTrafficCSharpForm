@@ -4,33 +4,25 @@ using SharpPcap;
 using PacketDotNet;
 using System.Runtime.InteropServices;
 using System.Net;
-using HtmlAgilityPack;
-using System.Diagnostics.Eventing.Reader;
-using System.Threading;
-using System.Linq.Expressions;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.IO;
 using System.Data.SqlClient;
-using System.Security.Cryptography;
-using PacketDotNet.Ieee80211;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using static NetworkTrafficCSharpForm.Form1;
+using Microsoft.VisualBasic;
+using NetworkTrafficCSharpForm.Properties;
 using System.Linq;
-//might try to just straight up netstat -a -n -o to get the information you need to find the responsible .exe's
-//using MaxMind.GeoIP2;
-//PREEETY MUCH TELL THIS APP TO IGNORE NOT PUTTING YOUR OWN IP RANGE AS BLANK AND NOT RUNNING THEM THROUGH THE INFORMATION FINDER
-//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
-//Things to change between nodes 111, 222, 333
+//if scaled up make sure pid's are only being passed for the current machine's IP.
+//Things to change between nodes  333
 namespace NetworkTrafficCSharpForm
 {
     public partial class Form1 : Form
     {
-      //  SqlConnection connection = null;
-        // Define your connection string to connect to your SQL Server database  111
-        string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\Source\\Repos\\DrNAMa\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True";
+        //  SqlConnection connection = null;
+        // Define your connection string to connect to your SQL Server database
+        string connectionString = Settings.Default.CS;
 
         // Define the SQL query to insert the data into the database
         string query = "INSERT INTO IPLog (Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country, SourceIP, DestinationIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version) " +
@@ -41,184 +33,17 @@ namespace NetworkTrafficCSharpForm
         static extern bool AllocConsole();
 
         private ICaptureDevice captureDevice;
-      //  [StructLayout(LayoutKind.Sequential)]
-
-        //public struct MIB_TCPROW_OWNER_PID
-        //{
-        //    public uint dwState;
-        //    public uint dwLocalAddr;
-        //    public uint dwLocalPort;
-        //    public uint dwRemoteAddr;
-        //    public uint dwRemotePort;
-        //    public uint dwOwningPid;
-        //}
-
-        //[DllImport("iphlpapi.dll")]
-        //public static extern int GetExtendedTcpTable(IntPtr pTcpTable, ref int pdwSize, bool bOrder, int ulAf, TcpTableClass tableClass, uint reserved = 0);
-
-        //public enum TcpTableClass : int
-        //{
-        //    TCP_TABLE_OWNER_PID_ALL
-        //}
-        //public enum TCP_TABLE_CLASS : int
-        //{
-        //    TCP_TABLE_BASIC_LISTENER,
-        //    TCP_TABLE_BASIC_CONNECTIONS,
-        //    TCP_TABLE_BASIC_ALL,
-        //    TCP_TABLE_OWNER_PID_LISTENER,
-        //    TCP_TABLE_OWNER_PID_CONNECTIONS,
-        //    TCP_TABLE_OWNER_PID_ALL,
-        //    TCP_TABLE_OWNER_MODULE_LISTENER,
-        //    TCP_TABLE_OWNER_MODULE_CONNECTIONS,
-        //    TCP_TABLE_OWNER_MODULE_ALL
-        //}
-
-        //[DllImport("iphlpapi.dll")]
-        //public static extern int GetExtendedUdpTable(IntPtr pUdpTable, ref int pdwSize, bool bOrder, int ulAf, UdpTableClass tableClass, uint reserved = 0);
-
-        //public enum UdpTableClass
-        //{
-        //    UDP_TABLE_OWNER_PID
-        //}
         public Form1()
         {
             InitializeComponent();
             AllocConsole();
-
             // Redirect the standard output stream to the console window
             StreamWriter writer = new StreamWriter(Console.OpenStandardOutput())
             {
                 AutoFlush = true
             };
-            Console.SetOut(writer);
-            // Test the console output
-          //  Console.WriteLine("This is a test message");
+            Console.SetOut(writer);         
         }
-
-    private void YaMum(int port, string proto)
-    { 
-        //int port = 8080; // Specify the port number you're interested in
-
-        string netstatOutput = RunNetstatCommand(port, "ESTABLISHED", proto);
-
-            if (netstatOutput == string.Empty)
-            {
-                netstatOutput = RunNetstatCommand(port, "LISTENING", proto);
-            }
-            if (netstatOutput == string.Empty)
-            {
-                return;
-            }
-
-            int lastSpaceIndex = netstatOutput.LastIndexOf(' '); // Find the index of the last space
-            string lastWord = netstatOutput.Substring(lastSpaceIndex + 1); // Extract the substring starting from the index after the last space
-            int[] yee = { 0 };
-            bool isNumeric = int.TryParse(lastWord, out _);
-            if (isNumeric)
-            {
-                int geeze = int.Parse(lastWord);
-                yee[0] += geeze;              
-                // Console.WriteLine(yee[1]);
-                string[] yeee = GetProgramNames(yee);
-                if (yeee.Length > 0)
-                {
-                    //var yeet = GetProgramNames(yee)[0];
-                    netstatOutput = yeee[0] + " : " + netstatOutput;
-                }
-               
-            }
-
-            Console.WriteLine(netstatOutput.Trim());
-        }
-         
-    public static string RunNetstatCommand(int port, string type, string proto)
-        {
-           
-
-
-            // Create a new process to execute the netstat command
-            Process process = new Process();
-            string arguments = $@"/C netstat -ano -p {proto} | findstr {type} | findstr :{port}"; 
-        // Set the start info for the process
-        process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.Arguments = arguments; //@"-ano -p tcp | findstr LISTENING | findstr :" + port;
-
-        // Redirect the output to read the command result
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.UseShellExecute = false;
-        process.StartInfo.CreateNoWindow = true;
-
-        // Start the process
-        process.Start();
-
-        // Read the output
-        string output = process.StandardOutput.ReadToEnd();
-
-        // Wait for the process to exit
-        process.WaitForExit();
-
-        return output;
-    }
-    private void Form1_Load(object sender, EventArgs e)
-        {
-           
-        }
-        private void Buttviewpackets_Click(object sender, EventArgs e)
-        {
-            panel1.Visible = true;
-            //string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //
-            SqlConnection connection = new SqlConnection(connectionString);
-            string query = "SELECT * FROM IPLog";
-            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-            DataTable dataTable = new DataTable();
-            adapter.Fill(dataTable);
-            dataGridView1.DataSource = dataTable;
-
-        }
-        private void GetIPData(string eyepee)
-        {
-            // URL of the webpage to scrape
-            string url = "https://www.whois.com/whois/" + eyepee;
-
-            // Download the webpage as an HTML document
-            WebClient client = new WebClient();
-            string html = client.DownloadString(url);
-            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
-            doc.LoadHtml(html);
-
-            // Extract the text from the <div class="df-block"> element
-            var divElement = doc.DocumentNode.SelectSingleNode("//div[@class='df-block']");
-            string text = divElement?.InnerText;
-            if (text != null)
-            {
-                IsolateData(text);
-            }
-         //  int jamimah = GetProcessIdOrFileName(eyepee, port);
-        } 
-      
-
-        private List<String> carrylist = new List<string>();
-        private void IsolateData(string derter)
-        {
-            string[] searchWords = { "Organization:", "OrgName:", "OrgId:", "Address:", "City:", "StateProv:", "PostalCode:", "Country:" };
-            foreach (string word in searchWords)
-            {
-                int index = derter.IndexOf(word);
-               // Console.WriteLine("Word: " + word + " Index: " + index);
-                if (index >= 0)
-                {
-                    int endIndex = derter.IndexOf("\n", index);
-                    if (endIndex < 0)
-                    {
-                        endIndex = derter.Length;
-                    }
-                    string value = derter.Substring(index + word.Length, endIndex - index - word.Length).Trim();
-                    Console.WriteLine(word + " " + value);
-                    carrylist.Add(value);
-                }
-            }
-        }
-
         private void OnPacketArrival(object sender, PacketCapture e)
         {
             // Get the captured packet
@@ -230,9 +55,9 @@ namespace NetworkTrafficCSharpForm
             {
                 string sourceordest = string.Empty;
                 // Check if the packet is coming from or going to a computer on your network
-                if (ipPacket.DestinationAddress.ToString().StartsWith("192.168.1.") || ipPacket.SourceAddress.ToString().StartsWith("192.168.1."))
+                if (ipPacket.DestinationAddress.ToString().StartsWith(TextBox1.Text) || ipPacket.SourceAddress.ToString().StartsWith(TextBox1.Text))
                 {
-                    if (!ipPacket.SourceAddress.ToString().StartsWith("192"))
+                    if (!ipPacket.SourceAddress.ToString().StartsWith(TextBox1.Text.Split('.').First()))
                     {
                         using (SqlConnection connection = new SqlConnection(connectionString))
                         {
@@ -252,17 +77,18 @@ namespace NetworkTrafficCSharpForm
                             sourceordest = "source";
                             if (count == 0)
                             {
-                                if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
-                                {
-                                    _ = tcpPacket.SourcePort;                                    
-                                }
-                                if (ipPacket.PayloadPacket is UdpPacket updPacket)
-                                {
-                                    _ = updPacket.SourcePort;
-                                }
+                                //if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
+                                //{
+                                //    _ = tcpPacket.SourcePort;
+                                //}
+                                //if (ipPacket.PayloadPacket is UdpPacket updPacket)
+                                //{
+                                //    _ = updPacket.SourcePort;
+                                //}
+                                // MAY OR MAY NOT NEED ABOVE CODE, IT WAS WORKING, BUT DIDN'T NOTICE IT DOING ANYTHING.
                                 GetIPData(ipPacket.SourceAddress.ToString());
 
-                               // YaMum(sourceport);
+                                // YaMum(sourceport);
 
                                 //int[] pids = { 996,4,3588,3588,7180,4,4520,1976,10500,2988,808,716,1316,1932,2988,788,924,4,4,3456,14856,3456,3448,3448,10500,4,10764,18728,3568,20104,3752,10500,20104,8036,20104,20104,22324,20104,20104,20104,20104,20104,20104,14232,14232,14232,14232,14232,14232,14232,14232,14232,14232,4,4,996,4,4,4520,1976,2988,808,716,1316,1932,2988,788,924,4,4,4,4,4,4,4,4,4,4,4,4,4356,4356,4356,4356,9304,4356,9304,9304,9304,9304,7180,2704,15248,15248,15248,2704,1976,10500,20104,20104,10500,0500,724,3224,724,4,4,724,724,4,4,724,724,4,4,724,724,724,4520,724 };
                                 //string[] programNames = GetProgramNames(pids);
@@ -276,7 +102,7 @@ namespace NetworkTrafficCSharpForm
                             }
                         }
                     }
-                    else if (!ipPacket.DestinationAddress.ToString().StartsWith("192"))
+                    else if (!ipPacket.DestinationAddress.ToString().StartsWith(TextBox1.Text.Split('.').First()))
                     {
                         using (SqlConnection connection = new SqlConnection(connectionString))
                         {
@@ -298,18 +124,19 @@ namespace NetworkTrafficCSharpForm
                             sourceordest = "dest";
                             if (count1 == 0)
                             {
-                                if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
-                                {
-                                    _ = tcpPacket.DestinationPort;
-                                }
-                                if (ipPacket.PayloadPacket is UdpPacket updPacket)
-                                {
-                                    _ = updPacket.DestinationPort;
-                                }
+                                //if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
+                                //{
+                                //    _ = tcpPacket.DestinationPort;
+                                //}
+                                //if (ipPacket.PayloadPacket is UdpPacket updPacket)
+                                //{
+                                //    _ = updPacket.DestinationPort;
+                                //}
+                                // MAY OR MAY NOT NEED ABOVE CODE, IT WAS WORKING, BUT DIDN'T NOTICE IT DOING ANYTHING.
                                 GetIPData(ipPacket.DestinationAddress.ToString());
 
 
-                              //  YaMum(destport);
+                                //  YaMum(destport);
                                 //int[] pids = { 996, 4, 3588, 3588, 7180, 4, 4520, 1976, 10500, 2988, 808, 716, 1316, 1932, 2988, 788, 924, 4, 4, 3456, 14856, 3456, 3448, 3448, 10500, 4, 10764, 18728, 3568, 20104, 3752, 10500, 20104, 8036, 20104, 20104, 22324, 20104, 20104, 20104, 20104, 20104, 20104, 14232, 14232, 14232, 14232, 14232, 14232, 14232, 14232, 14232, 14232, 4, 4, 996, 4, 4, 4520, 1976, 2988, 808, 716, 1316, 1932, 2988, 788, 924, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4356, 4356, 4356, 4356, 9304, 4356, 9304, 9304, 9304, 9304, 7180, 2704, 15248, 15248, 15248, 2704, 1976, 10500, 20104, 20104, 10500, 0500, 724, 3224, 724, 4, 4, 724, 724, 4, 4, 724, 724, 4, 4, 724, 724, 724, 4520, 724 };
                                 //string[] programNames = GetProgramNames(pids);
 
@@ -327,7 +154,7 @@ namespace NetworkTrafficCSharpForm
                         }
                     }
 
-               
+
 
                     int sport = 0;
                     int dport = 0;
@@ -344,18 +171,28 @@ namespace NetworkTrafficCSharpForm
                         dport = updPacket1.DestinationPort;
                         proto = "udp";
                     }
-
-                    if (ipPacket.DestinationAddress.ToString().StartsWith("192.168.1.188")) //333
+                    string yar = string.Empty;
+                    if (ipPacket.DestinationAddress.ToString().StartsWith(TextBox3.Text)) //333
                     {
-                        YaMum(dport, proto);                        
+                        yar = YaMum(dport, proto);
                     }
-                    else if (ipPacket.SourceAddress.ToString().StartsWith("192.168.1.188"))
+                    else if (ipPacket.SourceAddress.ToString().StartsWith(TextBox3.Text))
                     {
-                        YaMum(sport, proto);
+                        yar = YaMum(sport, proto);
                     }
-
+                    string[] splits = yar.Split(' ');
+                    int lastindex = splits.Length - 1;
+                    string exe = string.Empty;
+                    int? pid = null;
+                    if (lastindex > 0)
+                    {
+                        exe = splits[0];
+                        pid = int.Parse(splits[lastindex]);
+                    }
                     //   ipPacket.ParentPacket.PayloadPacket.
-                    // Display the source and destination IP addresses and the protocol of the captured packet
+                    // Display the source and destination IP addresses and the protocol of the captured packet                    
+                    Console.WriteLine("Program: " + exe);
+                    Console.WriteLine("Pid: " + pid);
                     Console.WriteLine("Source IP: " + ipPacket.SourceAddress.ToString() + ":" + sport);
                     Console.WriteLine("Destination IP: " + ipPacket.DestinationAddress.ToString() + ":" + dport);
                     Console.WriteLine("Protocol: " + ipPacket.Protocol.ToString());
@@ -395,14 +232,14 @@ namespace NetworkTrafficCSharpForm
                     //  Console.WriteLine("Protocol: " + ipPacket.Bytes.Length.ToString());
                     if (carrylist.Count > 0)
                     {
-                        InsertPacketToDatabase(sourceordest, ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
+                        InsertPacketToDatabase(exe, pid, sourceordest, ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
                                              ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, ipPacket.HeaderData.ToString(),
                                              ipPacket.HopLimit, ipPacket.PayloadLength, ipPacket.PayloadPacket.ToString(), ipPacket.TimeToLive, ipPacket.TotalLength, ipPacket.TotalPacketLength,
                                              ipPacket.Version.ToString(), carrylist[0], carrylist[1], carrylist[2], carrylist[3], carrylist[4], carrylist[5], carrylist[6], carrylist[7]);
                     }
                     else
                     {
-                        InsertPacketToDatabase(sourceordest, ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
+                        InsertPacketToDatabase(exe, pid, sourceordest, ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
                                              ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, ipPacket.HeaderData.ToString(),
                                              ipPacket.HopLimit, ipPacket.PayloadLength, ipPacket.PayloadPacket.ToString(), ipPacket.TimeToLive, ipPacket.TotalLength, ipPacket.TotalPacketLength,
                                              ipPacket.Version.ToString(), null, null, null, null, null, null, null, null);
@@ -413,11 +250,187 @@ namespace NetworkTrafficCSharpForm
                 {
                     Console.WriteLine("Stray Packet ALERT " + ipPacket.DestinationAddress + ":DestIP  &  SourceIP:" + ipPacket.SourceAddress.ToString());
                 }
-            
+
             }
+        }
+
+        private static string YaMum(int port, string proto)
+        { 
+        //int port = 8080; // Specify the port number you're interested in
+
+            string netstatOutput = RunNetstatCommand(port, "ESTABLISHED", proto);
+
+            if (netstatOutput == string.Empty)
+            {
+                netstatOutput = RunNetstatCommand(port, "LISTENING", proto);
+            }
+            if (netstatOutput == string.Empty)
+            {
+                return "";
+            }
+
+            int lastSpaceIndex = netstatOutput.LastIndexOf(' '); // Find the index of the last space
+            string lastWord = netstatOutput.Substring(lastSpaceIndex + 1); // Extract the substring starting from the index after the last space
+            int[] yee = { 0 };
+            bool isNumeric = int.TryParse(lastWord, out _);
+            if (isNumeric)
+            {
+                int geeze = int.Parse(lastWord);
+                yee[0] += geeze;              
+                // Console.WriteLine(yee[1]);
+                string[] yeee = GetProgramNames(yee);
+                if (yeee.Length > 0)
+                {
+                    //var yeet = GetProgramNames(yee)[0];
+                    netstatOutput = yeee[0] + " : " + netstatOutput;
+                }
+               
+            }
+            //Console.WriteLine(netstatOutput.Trim());
+            return netstatOutput;
+        }
+         
+        public static string RunNetstatCommand(int port, string type, string proto)
+        {
+            // Create a new process to execute the netstat command
+        Process process = new Process();
+        string arguments = $@"/C netstat -ano -p {proto} | findstr {type} | findstr :{port}"; 
+        // Set the start info for the process
+        process.StartInfo.FileName = "cmd.exe";
+            process.StartInfo.Arguments = arguments; //@"-ano -p tcp | findstr LISTENING | findstr :" + port;
+
+        // Redirect the output to read the command result
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.CreateNoWindow = true;
+
+        // Start the process
+        process.Start();
+
+        // Read the output
+        string output = process.StandardOutput.ReadToEnd();
+
+        // Wait for the process to exit
+        process.WaitForExit();
+
+        return output;
+        }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            var devices = CaptureDeviceList.Instance;
+            ComboBox1.Items.AddRange(devices.ToArray());
+
+
+            int desiredIndex = Settings.Default.Device; // Specify the desired index
+
+            NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+
+            if (desiredIndex >= 0 && desiredIndex < networkInterfaces.Length)
+            {
+                NetworkInterface desiredInterface = networkInterfaces[desiredIndex];
+
+                // Get the IP properties of the desired interface
+                IPInterfaceProperties ipProperties = desiredInterface.GetIPProperties();
+
+                // Retrieve the first IPv4 address assigned to the interface
+                IPAddress localIPAddress = ipProperties
+                    .UnicastAddresses
+                    .FirstOrDefault(addr => addr.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?.Address;
+
+                if (localIPAddress != null)
+                {
+                    TextBox2.Text = localIPAddress.ToString();
+                    // Use the local IP address as needed
+                }
+            }
+
+           
+
+            foreach (NetworkInterface networkInterface in networkInterfaces)
+            {
+                IPInterfaceProperties ipProperties = networkInterface.GetIPProperties();
+
+                foreach (UnicastIPAddressInformation unicastAddress in ipProperties.UnicastAddresses)
+                {
+                    if (unicastAddress.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    {
+                        IPAddress ipAddress = unicastAddress.Address;
+                        if (IsLocalNetworkIP(ipAddress))
+                            TextBox3.Text = ipAddress.ToString();
+                    }
+                }
+            }
+
+
+        }
+        bool IsLocalNetworkIP(IPAddress ipAddress)
+        {
+            // Check if the IP address belongs to the local network
+            // You can customize this logic based on your specific network configuration
+            // Example: Check if the IP address starts with a specific subnet range
+            string ipAddressString = ipAddress.ToString();
+            if (ipAddressString.StartsWith(TextBox1.Text) || ipAddressString.StartsWith("10."))
+            {
+                return true;
+            }
+
+            return false;
+        }
+        private void Buttviewpackets_Click(object sender, EventArgs e)
+        {
+            panel1.Visible = true;
+            //string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //
+            SqlConnection connection = new SqlConnection(connectionString);
+            string query = "SELECT * FROM IPLog";
+            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
+            DataTable dataTable = new DataTable();
+            adapter.Fill(dataTable);
+            dataGridView1.DataSource = dataTable;
+
+        }
+        private void GetIPData(string eyepee)
+        {
+            // URL of the webpage to scrape
+            string url = "https://www.whois.com/whois/" + eyepee;
+
+            // Download the webpage as an HTML document
+            WebClient client = new WebClient();
+            string html = client.DownloadString(url);
+            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(html);
+
+            // Extract the text from the <div class="df-block"> element
+            var divElement = doc.DocumentNode.SelectSingleNode("//div[@class='df-block']");
+            string text = divElement?.InnerText;
+            if (text != null)
+            {
+                IsolateData(text);
+            }
+         //  int jamimah = GetProcessIdOrFileName(eyepee, port);
         } 
+      
 
-
+        readonly List<String> carrylist = new List<string>();
+        private void IsolateData(string derter)
+        {
+            string[] searchWords = { "Organization:", "OrgName:", "OrgId:", "Address:", "City:", "StateProv:", "PostalCode:", "Country:" };
+            foreach (string word in searchWords)
+            {
+                int index = derter.IndexOf(word);
+               // Console.WriteLine("Word: " + word + " Index: " + index);
+                if (index >= 0)
+                {
+                    int endIndex = derter.IndexOf("\n", index);
+                    if (endIndex < 0)
+                    {
+                        endIndex = derter.Length;
+                    }
+                    string value = derter.Substring(index + word.Length, endIndex - index - word.Length).Trim();
+                    Console.WriteLine(word + " " + value);
+                    carrylist.Add(value);
+                }
+            }
+        }
 
         public static string[] GetProgramNames(int[] pids)
         {
@@ -435,78 +448,16 @@ namespace NetworkTrafficCSharpForm
                 }
             }
             return programNames;
-        }
-
-        
-
-    //    int GetProcessIdOrFileName(string sourceIp, int sourcePort)
-    //{
-    //    IPAddress localIpAddress = IPAddress.Parse(sourceIp);
-    //    ushort localPort = (ushort)sourcePort;
-
-    //    int bufferSize = 0;
-    //    GetExtendedTcpTable(IntPtr.Zero, ref bufferSize, true, 2, TcpTableClass.TCP_TABLE_OWNER_PID_ALL);
-    //    IntPtr tcpTable = Marshal.AllocHGlobal(bufferSize);
-
-    //    try
-    //    {
-    //        int result = GetExtendedTcpTable(tcpTable, ref bufferSize, true, 2, TcpTableClass.TCP_TABLE_OWNER_PID_ALL);
-    //        if (result == 0)
-    //        {
-    //            int rowCount = Marshal.ReadInt32(tcpTable);
-    //            IntPtr rowPtr = IntPtr.Add(tcpTable, 4);
-
-    //            for (int i = 0; i < rowCount; i++)
-    //            {
-    //                    MIB_TCPROW_OWNER_PID tcpRow = Marshal.PtrToStructure<MIB_TCPROW_OWNER_PID>(rowPtr);
-    //                    ushort port = (ushort)(((tcpRow.dwLocalPort & 0xFF00) >> 8) | ((tcpRow.dwLocalPort & 0x00FF) << 8));
-    //                    IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse(sourceIp), sourcePort);  
-
-    //                    if (!localEndPoint.Equals("0.0.0.0:0"))
-    //                    {
-    //                    int processId = (int)tcpRow.dwOwningPid;
-
-    //                    try
-    //                    {
-    //                        Process process = Process.GetProcessById(processId);
-    //                        string processFileName = process.MainModule.FileName;
-    //                        // Alternatively, you can use process.ProcessName to get the process name without the file path.
-
-    //                        Console.WriteLine($"Process ID: {processId}");
-    //                        Console.WriteLine($"Process File Name: {processFileName}");
-
-    //                        return processId;
-    //                    }
-    //                    catch (ArgumentException)
-    //                    {
-    //                        // Process with the given ID does not exist
-    //                        return -1;
-    //                    }
-    //                }
-
-    //                rowPtr = IntPtr.Add(rowPtr, Marshal.SizeOf(tcpRow));
-    //            }
-    //        }
-    //    }
-    //    finally
-    //    {
-    //        Marshal.FreeHGlobal(tcpTable);
-    //    }
-
-    //    return -1; // Process ID not found
-    //}
-
-
-    
+        }    
         private void BtnStartCapture_Click(object sender, EventArgs e)
         {
             try
             {
                 // Get the list of available capture devices
                 var devices = CaptureDeviceList.Instance;
-
+                int devind = Settings.Default.Device;
                 // Select the first available device 0 for W  2? for H
-                captureDevice = devices[2]; //222
+                captureDevice = devices[devind]; //222
                 DeviceModes mode = DeviceModes.None;
                 int read_timeout = 1000;
                 var configuration = new DeviceConfiguration()
@@ -581,7 +532,7 @@ namespace NetworkTrafficCSharpForm
             Console.WriteLine("Destination MAC: {0}", header.DestinationMAC);
         }
 
-        private void InsertPacketToDatabase(string sourceordest, string sourceIP, string destIP, string protocol, int packetSize, string packetColor, bool hasPayloadPacket, bool hasPayloadData, bool isPayloadInitialized, int headerLength, string headerData, int hopLimit, int payloadDataLength, string payloadPacket, int timeToLive, int totalLength, int totalPacketLength, string version, string organization, string orgName, string orgId, string address, string city, string stateProv, string postalCode, string country)
+        private void InsertPacketToDatabase(string program, int? pid, string sourceordest, string sourceIP, string destIP, string protocol, int packetSize, string packetColor, bool hasPayloadPacket, bool hasPayloadData, bool isPayloadInitialized, int headerLength, string headerData, int hopLimit, int payloadDataLength, string payloadPacket, int timeToLive, int totalLength, int totalPacketLength, string version, string organization, string orgName, string orgId, string address, string city, string stateProv, string postalCode, string country)
         {
 
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -622,8 +573,10 @@ namespace NetworkTrafficCSharpForm
                 {
                     if (organization is null)
                     {
-                        query = "INSERT INTO IpLog (SourceIP, DestIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version) VALUES (@SourceIP, @DestIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version)";
+                        query = "INSERT INTO IpLog (Program, Pid, SourceIP, DestIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version) VALUES (@Program, @Pid, @SourceIP, @DestIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version)";
                         cmd = new SqlCommand(query, connection);
+                        cmd.Parameters.AddWithValue("@Program", program);
+                        cmd.Parameters.AddWithValue("@Pid", pid);
                         cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
                         cmd.Parameters.AddWithValue("@DestIP", destIP);
                         cmd.Parameters.AddWithValue("@Protocol", protocol);
@@ -645,8 +598,10 @@ namespace NetworkTrafficCSharpForm
                     }
                     else
                     {
-                        query = "INSERT INTO IpLog (SourceIP, DestIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version, Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country) VALUES (@SourceIP, @DestIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version, @Organization, @OrgName, @OrgId, @Address, @City, @StateProv, @PostalCode, @Country)";
+                        query = "INSERT INTO IpLog (Program, Pid, SourceIP, DestIP, Protocol, PacketSize, PacketColor, HasPayloadPacket, HasPayloadData, IsPayloadInitialized, HeaderLength, HeaderData, HopLimit, PayloadDataLength, PayloadPacket, TimeToLive, TotalLength, TotalPacketLength, Version, Organization, OrgName, OrgId, Address, City, StateProv, PostalCode, Country) VALUES (@Program, @Pid, @SourceIP, @DestIP, @Protocol, @PacketSize, @PacketColor, @HasPayloadPacket, @HasPayloadData, @IsPayloadInitialized, @HeaderLength, @HeaderData, @HopLimit, @PayloadDataLength, @PayloadPacket, @TimeToLive, @TotalLength, @TotalPacketLength, @Version, @Organization, @OrgName, @OrgId, @Address, @City, @StateProv, @PostalCode, @Country)";
                         cmd = new SqlCommand(query, connection);
+                        cmd.Parameters.AddWithValue("@Program", program);
+                        cmd.Parameters.AddWithValue("@Pid", pid);
                         cmd.Parameters.AddWithValue("@SourceIP", sourceIP);
                         cmd.Parameters.AddWithValue("@DestIP", destIP);
                         cmd.Parameters.AddWithValue("@Protocol", protocol);
@@ -676,12 +631,26 @@ namespace NetworkTrafficCSharpForm
                     }
                 }
             }
-        }      
-      
-      
+        }
 
+        private void DataConnButt_Click(object sender, EventArgs e)
+        {
+            connectionString  = Interaction.InputBox("Enter your Database Connection String here as such: \nData Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\IPLogs.mdf;Integrated Security=True", "Connection String Required");
+            Settings.Default.CS = connectionString;
+            Settings.Default.Save();
+        }
 
+        private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Settings.Default.Device = ComboBox1.SelectedIndex;
+            Settings.Default.Save();
+        }
 
+        private void TextBox1_TextChanged(object sender, EventArgs e)
+        {
+            Settings.Default.LN = TextBox1.Text;
+            Settings.Default.Save();
+        }
     }
     class EthernetHeader
     {
@@ -693,7 +662,7 @@ namespace NetworkTrafficCSharpForm
 //MAXMIND API METHOD
 //private void GetIPData2(string eyepee)
 //{
-//    using (var reader = new DatabaseReader("C:\\Users\\holyh\\AppData\\Roaming\\Wireshark\\GeoLite2-City.mmdb"))
+//    using (var reader = new DatabaseReader("C:\\Users\\????\\AppData\\Roaming\\Wireshark\\GeoLite2-City.mmdb"))
 //    {
 
 //        try
