@@ -1,4 +1,4 @@
-<h1> This is an open source project that I'm building to help secure the little guy free of charge, malware, ad-ware, bloatware and any other warez that make downloading tools dreadful.
+<h1> This is an open source project, using Visual Studio with C#, that I'm building to help secure the little guy free of charge, malware, ad-ware, bloatware and any other warez that make downloading tools dreadful.
     <br>
     <br>
   <h2>What does it do?
