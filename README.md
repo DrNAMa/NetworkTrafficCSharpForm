@@ -2,7 +2,7 @@
     <br>
     <br>
   <h2>What does it do?
-    <h3>It Captures each incomming packet, sends foreign IP information off for analysis and then everything is stored in a database.
+    <h3>It Captures each incoming packet, sends foreign IP information off for analysis and then everything is stored in a database.
       <br>
       <br>
   <h2> How to Set it Up?
