@@ -183,7 +183,7 @@ namespace NetworkTrafficCSharpForm
                     string[] splits = yar.Split(' ');
                     int lastindex = splits.Length - 1;
                     string exe = string.Empty;
-                    int? pid = null;
+                    int pid = 99999;
                     if (lastindex > 0)
                     {
                         exe = splits[0];
@@ -204,8 +204,10 @@ namespace NetworkTrafficCSharpForm
                     Console.WriteLine("Is Payload Initialized: " + ipPacket.IsPayloadInitialized.ToString());
                     Console.WriteLine("Header Length: " + ipPacket.HeaderLength.ToString());
                     Console.WriteLine("Header Data:");
+                    string bitten = string.Empty;
                     foreach (byte b in ipPacket.HeaderData)
                     {
+                        bitten += b.ToString("X2") + " ";
                         Console.Write(b.ToString("X2") + " ");
                     }
                     Console.WriteLine();
@@ -233,14 +235,14 @@ namespace NetworkTrafficCSharpForm
                     if (carrylist.Count > 0)
                     {
                         InsertPacketToDatabase(exe, pid, sourceordest, ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
-                                             ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, ipPacket.HeaderData.ToString(),
+                                             ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, bitten,
                                              ipPacket.HopLimit, ipPacket.PayloadLength, ipPacket.PayloadPacket.ToString(), ipPacket.TimeToLive, ipPacket.TotalLength, ipPacket.TotalPacketLength,
                                              ipPacket.Version.ToString(), carrylist[0], carrylist[1], carrylist[2], carrylist[3], carrylist[4], carrylist[5], carrylist[6], carrylist[7]);
                     }
                     else
                     {
                         InsertPacketToDatabase(exe, pid, sourceordest, ipPacket.SourceAddress.ToString(), ipPacket.DestinationAddress.ToString(), ipPacket.Protocol.ToString(), ipPacket.Bytes.Length, ipPacket.Color.ToString(),
-                                             ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, ipPacket.HeaderData.ToString(),
+                                             ipPacket.HasPayloadPacket, ipPacket.HasPayloadData, ipPacket.IsPayloadInitialized, ipPacket.HeaderLength, bitten,
                                              ipPacket.HopLimit, ipPacket.PayloadLength, ipPacket.PayloadPacket.ToString(), ipPacket.TimeToLive, ipPacket.TotalLength, ipPacket.TotalPacketLength,
                                              ipPacket.Version.ToString(), null, null, null, null, null, null, null, null);
                     }
@@ -532,7 +534,7 @@ namespace NetworkTrafficCSharpForm
             Console.WriteLine("Destination MAC: {0}", header.DestinationMAC);
         }
 
-        private void InsertPacketToDatabase(string program, int? pid, string sourceordest, string sourceIP, string destIP, string protocol, int packetSize, string packetColor, bool hasPayloadPacket, bool hasPayloadData, bool isPayloadInitialized, int headerLength, string headerData, int hopLimit, int payloadDataLength, string payloadPacket, int timeToLive, int totalLength, int totalPacketLength, string version, string organization, string orgName, string orgId, string address, string city, string stateProv, string postalCode, string country)
+        private void InsertPacketToDatabase(string program, int pid, string sourceordest, string sourceIP, string destIP, string protocol, int packetSize, string packetColor, bool hasPayloadPacket, bool hasPayloadData, bool isPayloadInitialized, int headerLength, string headerData, int hopLimit, int payloadDataLength, string payloadPacket, int timeToLive, int totalLength, int totalPacketLength, string version, string organization, string orgName, string orgId, string address, string city, string stateProv, string postalCode, string country)
         {
 
             using (SqlConnection connection = new SqlConnection(connectionString))
