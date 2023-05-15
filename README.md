@@ -94,6 +94,7 @@
       <br>
       <br>
       I'd like to be able to get better location data as the whois this is connected to gets caught up with bot checks, any suggestions?<br>
+      It'd be great to see live graphs on the incoming data statistics.
       <br>
    
       
