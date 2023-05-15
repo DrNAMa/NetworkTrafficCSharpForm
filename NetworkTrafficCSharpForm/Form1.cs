@@ -76,29 +76,8 @@ namespace NetworkTrafficCSharpForm
                             connection.Close();
                             sourceordest = "source";
                             if (count == 0)
-                            {
-                                //if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
-                                //{
-                                //    _ = tcpPacket.SourcePort;
-                                //}
-                                //if (ipPacket.PayloadPacket is UdpPacket updPacket)
-                                //{
-                                //    _ = updPacket.SourcePort;
-                                //}
-                                // MAY OR MAY NOT NEED ABOVE CODE, IT WAS WORKING, BUT DIDN'T NOTICE IT DOING ANYTHING.
+                            {                               
                                 GetIPData(ipPacket.SourceAddress.ToString());
-
-                                // YaMum(sourceport);
-
-                                //int[] pids = { 996,4,3588,3588,7180,4,4520,1976,10500,2988,808,716,1316,1932,2988,788,924,4,4,3456,14856,3456,3448,3448,10500,4,10764,18728,3568,20104,3752,10500,20104,8036,20104,20104,22324,20104,20104,20104,20104,20104,20104,14232,14232,14232,14232,14232,14232,14232,14232,14232,14232,4,4,996,4,4,4520,1976,2988,808,716,1316,1932,2988,788,924,4,4,4,4,4,4,4,4,4,4,4,4,4356,4356,4356,4356,9304,4356,9304,9304,9304,9304,7180,2704,15248,15248,15248,2704,1976,10500,20104,20104,10500,0500,724,3224,724,4,4,724,724,4,4,724,724,4,4,724,724,724,4520,724 };
-                                //string[] programNames = GetProgramNames(pids);
-
-                                //for (int i = 0; i < pids.Length; i++)
-                                //{
-                                //    Console.WriteLine("PID: {0}, Program Name: {1}", pids[i], programNames[i]);
-                                //}
-                                // GetProgramNames(pids);
-                                //  GetIPData2(ipPacket.SourceAddress.ToString());
                             }
                         }
                     }
@@ -123,38 +102,11 @@ namespace NetworkTrafficCSharpForm
                             connection.Close();
                             sourceordest = "dest";
                             if (count1 == 0)
-                            {
-                                //if (ipPacket.PayloadPacket is TcpPacket tcpPacket)
-                                //{
-                                //    _ = tcpPacket.DestinationPort;
-                                //}
-                                //if (ipPacket.PayloadPacket is UdpPacket updPacket)
-                                //{
-                                //    _ = updPacket.DestinationPort;
-                                //}
-                                // MAY OR MAY NOT NEED ABOVE CODE, IT WAS WORKING, BUT DIDN'T NOTICE IT DOING ANYTHING.
+                            {                               
                                 GetIPData(ipPacket.DestinationAddress.ToString());
-
-
-                                //  YaMum(destport);
-                                //int[] pids = { 996, 4, 3588, 3588, 7180, 4, 4520, 1976, 10500, 2988, 808, 716, 1316, 1932, 2988, 788, 924, 4, 4, 3456, 14856, 3456, 3448, 3448, 10500, 4, 10764, 18728, 3568, 20104, 3752, 10500, 20104, 8036, 20104, 20104, 22324, 20104, 20104, 20104, 20104, 20104, 20104, 14232, 14232, 14232, 14232, 14232, 14232, 14232, 14232, 14232, 14232, 4, 4, 996, 4, 4, 4520, 1976, 2988, 808, 716, 1316, 1932, 2988, 788, 924, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4356, 4356, 4356, 4356, 9304, 4356, 9304, 9304, 9304, 9304, 7180, 2704, 15248, 15248, 15248, 2704, 1976, 10500, 20104, 20104, 10500, 0500, 724, 3224, 724, 4, 4, 724, 724, 4, 4, 724, 724, 4, 4, 724, 724, 724, 4520, 724 };
-                                //string[] programNames = GetProgramNames(pids);
-
-                                //for (int i = 0; i < pids.Length; i++)
-                                //{
-                                //    Console.WriteLine("PID: {0}, Program Name: {1}", pids[i], programNames[i]);
-                                //}
-                                //  GetProgramNames(pids);
-
-                                //   int port = 8080; // Specify the port number you're interested in
-
-
-                                //   GetIPData2(ipPacket.DestinationAddress.ToString());
                             }
                         }
                     }
-
-
 
                     int sport = 0;
                     int dport = 0;
@@ -344,9 +296,7 @@ namespace NetworkTrafficCSharpForm
                     TextBox2.Text = localIPAddress.ToString();
                     // Use the local IP address as needed
                 }
-            }
-
-           
+            }           
 
             foreach (NetworkInterface networkInterface in networkInterfaces)
             {
@@ -362,8 +312,6 @@ namespace NetworkTrafficCSharpForm
                     }
                 }
             }
-
-
         }
         bool IsLocalNetworkIP(IPAddress ipAddress)
         {
