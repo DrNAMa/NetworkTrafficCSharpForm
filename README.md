@@ -5,8 +5,9 @@
     <h3>It Captures each incoming packet, sends foreign IP information off for analysis and then everything is stored in a database.
       <br>
       <br>
-  <h2> How to Set it Up?
+  <h2> How to Set it Up? (assuming we're using visual studio)
     <h3> Right Click on NetworkTrafficCSharpForm >> Add >> New Item >> Service-based Database >> Name the database IPLogs.mdf <br>
+	 Create a new Table under this database and name it IPLog<br>   
       <br>
       Select ID, and under it's properties, expand Identiy Specification and make sure it is set true and 1's.
       <br>
