@@ -86,9 +86,9 @@
       <br>
       <br>
       <br>
-      Things that I'll probably Continue to work on...<br>
+      <h2>Things that I'll probably Continue to work on...<br>
       <br>
-      Upgrading the Gui<br>
+      <h3>Upgrading the Gui<br>
       Get the datagridview to update automatically<br>
       Decoding/encoding packet data.<br>
       <br>
