@@ -6,10 +6,11 @@
       <br>
       <br>
   <h2> How to Set it Up? (assuming we're using visual studio)
+    <h3> When running the program, run it or visual studio as administrator<br>	  
     <h3> Right Click on NetworkTrafficCSharpForm >> Add >> New Item >> Service-based Database >> Name the database IPLogs.mdf <br>
-	 Create a new Table under this database and name it IPLog<br>   
+    <h3> Create a new Table under this database and name it IPLog<br>   
       <br>
-      Select ID, and under it's properties, expand Identiy Specification and make sure it is set true and 1's.
+      Select ID, and under it's properties, expand Identiy Specification and make sure it is set to true and 1's.
       <br>
       Insert Columns with these Headers and attributes.
       <br>
@@ -93,6 +94,9 @@
       Get the datagridview to update automatically<br>
       Decoding/encoding packet data.<br>
       <br>
+      <h2>Quirks:<br>
+	      <h3>At the moment, you have to press the View Packet Button again to update the data view.<br>
+	      <h3>The Capture Ethernet Packets Button is there for library capability testing.<br> 
       <br>
       I'd like to be able to get better location data as the whois this is connected to gets caught up with bot checks, any suggestions?<br>
       It'd be great to see live graphs on the incoming data statistics.
