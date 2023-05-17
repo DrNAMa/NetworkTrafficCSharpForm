@@ -13,9 +13,8 @@
   <h2> How to Set it Up? (assuming we're using visual studio)
     <h3> When running the program, run it or visual studio as administrator<br>	  
     <h3> Right Click on NetworkTrafficCSharpForm >> Add >> New Item >> Service-based Database >> Name the database IPLogs.mdf <br>
-	    ![s1](https://github.com/DrNAMa/NetworkTrafficCSharpForm/assets/86138034/c4a55e5c-c4fb-4928-b399-5cc73c3dae35) <br>
-![s2](https://github.com/DrNAMa/NetworkTrafficCSharpForm/assets/86138034/6e6ba049-1778-4c83-9b55-b3258b970d69) <br>
-
+	    <img src="https://github.com/DrNAMa/NetworkTrafficCSharpForm/assets/86138034/c4a55e5c-c4fb-4928-b399-5cc73c3dae35" alt="Alt text" title="Optional title">
+	    <img src="https://github.com/DrNAMa/NetworkTrafficCSharpForm/assets/86138034/6e6ba049-1778-4c83-9b55-b3258b970d69" alt="Alt text" title="Optional title">
     <h3> Create a new Table under this database and name it IPLog<br>   
       <br>
       Select ID, and under it's properties, expand Identiy Specification and make sure it is set to true and 1's.
