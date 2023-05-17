@@ -1,8 +1,13 @@
-<h1> This is an open source project, using Visual Studio with C#, that I'm building to help secure the little guy free of charge, malware, ad-ware, bloatware and any other warez that make downloading tools dreadful.
+<h1> This is an open source project, using Visual Studio with C#, that I'm building to help secure the little guy free of charge, malware, ad-ware, bloatware and any other warez that make downloading tools dreadful.<br>
+	This tool is makes heavy use of Chatgpt	<br>		
+	<h2>Contributors Welcome<br>	
     <br>
-    <br>
+	<br>	    
   <h2>What does it do?
-    <h3>It Captures each incoming packet, sends foreign IP information off for analysis and then everything is stored in a database.
+	<h3>It captures each incoming packet on the monitored network
+	<h3>Sends the foreign IP information off for analysis (currently using Whois.com)
+	<h3>Stores Connection History in a database
+	<h3>Provides a view for the database
       <br>
       <br>
   <h2> How to Set it Up? (assuming we're using visual studio)
@@ -14,6 +19,7 @@
       <br>
       Insert Columns with these Headers and attributes.
       <br>
+	    <h5>
   Id int	False	<br>
 	Program	nvarchar(50)	True	<br>
 	Pid	int	True	<br>
@@ -44,9 +50,9 @@
 	Version	nvarchar(50)	True	<br>
 <br>
     <br>  
-      Or use the script below
+    <h3>  Or use the script below
       <br>
-      <br>
+      <br><h5>
       CREATE TABLE [dbo].[IPLog] ( <br>
     [Id]                   INT            IDENTITY (1, 1) NOT NULL, <br>
     [Program]              NVARCHAR (50)  NULL,<br>
@@ -80,6 +86,7 @@
 );<br>
       <br>
       <br>
+      <h3>
       From there, enter what part of your network you want to monitor ie: (with the dot at the end)<br>
       192.168.1. or 192.168.<br>
       Select Your Capture (Network) Device.<br>
@@ -93,13 +100,17 @@
       <h3>Upgrading the Gui<br>
       Get the datagridview to update automatically<br>
       Decoding/encoding packet data.<br>
+      Add a way to delete database rows (for now I'm just relying on visual basic to empty out the database)<br>
+      Figure out which data can be refreshed and if and when it is appropriate to update an entry<br>
       <br>
       <h2>Quirks:<br>
 	      <h3>At the moment, you have to press the View Packet Button again to update the data view.<br>
-	      <h3>The Capture Ethernet Packets Button is there for library capability testing.<br> 
-      <br>
-      I'd like to be able to get better location data as the whois this is connected to gets caught up with bot checks, any suggestions?<br>
-      It'd be great to see live graphs on the incoming data statistics.
+	      <h3>The Capture Ethernet Packets Button is there for library capability testing.<br>
+	      <h3> Can't directly delete stored items
+      <br
+      <h2> Future Possiblities:<br>
+      <h3>I'd like to be able to get better location data as the whois this is connected to gets caught up with bot checks, any suggestions?<br>
+      <h3>It'd be great to see live graphs on the incoming data statistics.
       <br>
    
       
