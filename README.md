@@ -1,5 +1,5 @@
 <h1> This is an open source project, using Visual Studio with C#, that I'm building to help secure the little guy free of charge, malware, ad-ware, bloatware and any other warez that make downloading tools dreadful.<br>
-	This tool is makes heavy use of Chatgpt	<br>		
+	This tool makes heavy use of Chatgpt	<br>		
 	<h2>Contributors Welcome<br>	
     <br>
 	<br>	    
