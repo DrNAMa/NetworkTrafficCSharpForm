@@ -1,8 +1,6 @@
 <h1> This is an open source project, using Visual Studio with C#, that I'm building to help secure the little guy free of charge, malware, ad-ware, bloatware and any other warez that make downloading tools dreadful.<br>
 	This tool makes heavy use of Chatgpt	<br>		
-	<h2>Contributors Welcome<br>	
-    <br>
-	<br>	    
+	<h1>$${\color{green}Contributors Welcome}$$  		    
   <h2>What does it do?
 	<h3>It captures each incoming packet on the monitored network
 	<h3>Sends the foreign IP information off for analysis (currently using Whois.com)
@@ -13,7 +11,7 @@
   <h2> How to Set it Up? (assuming we're using visual studio)
     <h3> When running the program, run it or visual studio as administrator<br>	  
     <h3> Right Click on NetworkTrafficCSharpForm >> Add >> New Item >> Service-based Database >> Name the database IPLogs.mdf <br>
-	    <img src="https://github.com/DrNAMa/NetworkTrafficCSharpForm/assets/86138034/c4a55e5c-c4fb-4928-b399-5cc73c3dae35" alt="Alt text" title="Optional title">
+	    <img src="https://github.com/DrNAMa/NetworkTrafficCSharpForm/assets/86138034/c4a55e5c-c4fb-4928-b399-5cc73c3dae35" alt="Alt text" title="Optional title"><br><br>
 	    <img src="https://github.com/DrNAMa/NetworkTrafficCSharpForm/assets/86138034/6e6ba049-1778-4c83-9b55-b3258b970d69" alt="Alt text" title="Optional title">
     <h3> Create a new Table under this database and name it IPLog<br>   
       <br>
@@ -97,8 +95,7 @@
       <br>
       <br>
       <br>
-      <h2>Things that I'll probably Continue to work on...<br>
-      <br>
+      <h2>Things that I'll probably Continue to work on...<br>      
       <h3>Upgrading the Gui<br>
       Get the datagridview to update automatically<br>
       Decoding/encoding packet data.<br>
@@ -106,10 +103,11 @@
       Figure out which data can be refreshed and if and when it is appropriate to update an entry<br>
       <br>
       <h2>Quirks:<br>
-	      <h3>At the moment, you have to press the View Packet Button again to update the data view.<br>
-	      <h3>The Capture Ethernet Packets Button is there for library capability testing.<br>
-	      <h3> Can't directly delete stored items
-      <br
+	<h3>At the moment, you have to press the View Packet Button again to update the data view.<br>
+	<h3>The Capture Ethernet Packets Button is there for library capability testing.<br>
+	<h3>Can't directly delete stored items
+	<h3>Due to Pid 0 being used by 'System Idle', Pid 99999 is used to indicate an unidentified/unknown program.
+      <br>
       <h2> Future Possiblities:<br>
       <h3>I'd like to be able to get better location data as the whois this is connected to gets caught up with bot checks, any suggestions?<br>
       <h3>It'd be great to see live graphs on the incoming data statistics.
