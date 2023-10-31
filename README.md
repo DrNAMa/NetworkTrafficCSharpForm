@@ -1,7 +1,7 @@
 <h1> This is an open source project made using Visual Studio with C#, that I'm building to help secure the little guy free of charge, malware, ad-ware, bloatware and any other warez that make downloading tools dreadful.<br>
 	This tool makes heavy use of Chatgpt	<br>		
 	This tool uses SharpPCap and PacketDotNet Libraries<br>
-	<h1>$${\color{lightgreen}Contributors Welcome}$$  		    
+	<h1>**Contributors Welcome**  		    
   <h2>What does it do?
 	<h3>It captures each incoming packet on the monitored network
 	<h3>Sends the foreign IP information off for analysis (currently using Whois.com)
