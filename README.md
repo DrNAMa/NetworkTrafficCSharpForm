@@ -1,4 +1,4 @@
-<h1> This is an open source project made using Visual Studio with C#, that I'm building to help secure the little guy free of charge, malware, ad-ware, bloatware and any other warez that make downloading tools dreadful.<br>
+<h1> This is an open source project made using Visual Studio with C#. Secure yoourself free of charge, and free of malware, ad-ware, bloatware and any other warez that make downloading tools dreadful.<br>
 	This tool makes heavy use of Chatgpt	<br>		
 	This tool uses SharpPCap and PacketDotNet Libraries<br>
 	<h1>**Contributors Welcome**  		    
