@@ -1,19 +1,20 @@
-﻿using System;
-using System.Windows.Forms;
-using SharpPcap;
+﻿using Microsoft.VisualBasic;
+using NetworkTrafficCSharpForm.Properties;
 using PacketDotNet;
-using System.Runtime.InteropServices;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.IO;
-using System.Data.SqlClient;
+using SharpPcap;
+using SharpPcap.LibPcap;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
-using Microsoft.VisualBasic;
-using NetworkTrafficCSharpForm.Properties;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Windows.Forms;
 //if scaled up make sure pid's are only being passed for the current machine's IP.
 //Things to change between nodes  333
 namespace NetworkTrafficCSharpForm
@@ -42,7 +43,8 @@ namespace NetworkTrafficCSharpForm
             {
                 AutoFlush = true
             };
-            Console.SetOut(writer);         
+          // Console.WriteLine("View Caputred Packet Here:");
+            Console.SetOut(writer);           
         }
         private void OnPacketArrival(object sender, PacketCapture e)
         {
@@ -271,8 +273,21 @@ namespace NetworkTrafficCSharpForm
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-            var devices = CaptureDeviceList.Instance;
-            ComboBox1.Items.AddRange(devices.ToArray());
+            var deviceItems = CaptureDeviceList.Instance
+    .Select(dev => new
+    {
+        Name = (dev is LibPcapLiveDevice liveDev && !string.IsNullOrWhiteSpace(liveDev.Interface?.FriendlyName))
+               ? $"{liveDev.Interface.FriendlyName} ({dev.Description})" // or just liveDev.Interface.FriendlyName
+               : dev.Description,
+        Device = dev
+    })
+    .ToList();
+
+            ComboBox1.DisplayMember = "Name";
+            ComboBox1.ValueMember = "Device";
+            ComboBox1.DataSource = deviceItems;
+           // var devices = CaptureDeviceList.Instance;
+           // ComboBox1.Items.AddRange(devices.ToArray());
 
 
             int desiredIndex = Settings.Default.Device; // Specify the desired index
@@ -329,7 +344,7 @@ namespace NetworkTrafficCSharpForm
         private void Buttviewpackets_Click(object sender, EventArgs e)
         {
             panel1.Visible = true;
-            //string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\holyh\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //
+            //string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\\Users\\(USER)\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\(USER)\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //
             SqlConnection connection = new SqlConnection(connectionString);
             string query = "SELECT * FROM IPLog";
             SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
