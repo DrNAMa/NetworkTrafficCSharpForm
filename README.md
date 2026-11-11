@@ -11,6 +11,7 @@
       <br>
   <h2> How to Set it Up? (assuming we're using visual studio)
 	<h3>  npcap installation is required.<br>
+    <h3> In this repo, navigate to NetworkTrafficCSharpForm >> NetworkTrafficCSharpForm >> packages.config and look for the version numbers and add them via NuGet<br>
     <h3> When running the program, run it or visual studio as administrator<br>	  
     <h3> Right Click on NetworkTrafficCSharpForm >> Add >> New Item >> Service-based Database >> Name the database IPLogs.mdf <br>
 	    <img src="https://github.com/DrNAMa/NetworkTrafficCSharpForm/assets/86138034/c4a55e5c-c4fb-4928-b399-5cc73c3dae35" alt="Alt text" title="Optional title"><br><br>
