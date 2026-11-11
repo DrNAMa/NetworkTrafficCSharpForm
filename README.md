@@ -1,6 +1,6 @@
 <h1> This is an open source project made using Visual Studio with C#. Secure yourself free of charge, and free of malware, ad-ware, bloatware and any other warez that make downloading tools dreadful.<br>
 	This tool makes heavy use of Chatgpt	<br>		
-	This tool uses SharpPCap and PacketDotNet Libraries<br>
+	This tool uses SharpPCap and PacketDotNet Libraries<br>	
 	<h1>**Contributors Welcome**  		    
   <h2>What does it do?
 	<h3>It captures each incoming packet on the monitored network
@@ -10,6 +10,7 @@
       <br>
       <br>
   <h2> How to Set it Up? (assuming we're using visual studio)
+	<h3>  npcap installation is required.<br>
     <h3> When running the program, run it or visual studio as administrator<br>	  
     <h3> Right Click on NetworkTrafficCSharpForm >> Add >> New Item >> Service-based Database >> Name the database IPLogs.mdf <br>
 	    <img src="https://github.com/DrNAMa/NetworkTrafficCSharpForm/assets/86138034/c4a55e5c-c4fb-4928-b399-5cc73c3dae35" alt="Alt text" title="Optional title"><br><br>
@@ -87,6 +88,8 @@
 );<br>
       <br>
       <br>
+	  <h3> Use the connection string formatted like this when pressing the button in the program <br>
+	  Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\(USER)\source\repos\NetworkTrafficCSharpForm\NetworkTrafficCSharpForm\IPLogs.mdf;Integrated Security=True <br>
       <h3>
       From there, enter what part of your network you want to monitor ie: (with the dot at the end)<br>
       192.168.1. or 192.168.<br>
@@ -113,7 +116,3 @@
       <h3>I'd like to be able to get better location data as the whois this is connected to gets caught up with bot checks, any suggestions?<br>
       <h3>It'd be great to see live graphs on the incoming data statistics.
       <br>
-   
-      
-    
-      
