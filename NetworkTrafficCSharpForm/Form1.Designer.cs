@@ -32,7 +32,7 @@
             this.BtnStartCapture = new System.Windows.Forms.Button();
             this.BtnStopCapture = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.buttviewpackets = new System.Windows.Forms.Button();
+            this.buttviewconnections = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.DataConnButt = new System.Windows.Forms.Button();
@@ -80,16 +80,16 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
-            // buttviewpackets
+            // buttviewconnections
             // 
-            this.buttviewpackets.Location = new System.Drawing.Point(361, 14);
-            this.buttviewpackets.Margin = new System.Windows.Forms.Padding(4);
-            this.buttviewpackets.Name = "buttviewpackets";
-            this.buttviewpackets.Size = new System.Drawing.Size(164, 47);
-            this.buttviewpackets.TabIndex = 3;
-            this.buttviewpackets.Text = "View Packets";
-            this.buttviewpackets.UseVisualStyleBackColor = true;
-            this.buttviewpackets.Click += new System.EventHandler(this.Buttviewpackets_Click);
+            this.buttviewconnections.Location = new System.Drawing.Point(361, 14);
+            this.buttviewconnections.Margin = new System.Windows.Forms.Padding(4);
+            this.buttviewconnections.Name = "buttviewconnections";
+            this.buttviewconnections.Size = new System.Drawing.Size(188, 47);
+            this.buttviewconnections.TabIndex = 3;
+            this.buttviewconnections.Text = "View Connections";
+            this.buttviewconnections.UseVisualStyleBackColor = true;
+            this.buttviewconnections.Click += new System.EventHandler(this.Buttviewconnections_Click);
             // 
             // panel1
             // 
@@ -226,7 +226,7 @@
             this.Controls.Add(this.ComboBox1);
             this.Controls.Add(this.DataConnButt);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.buttviewpackets);
+            this.Controls.Add(this.buttviewconnections);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.BtnStopCapture);
             this.Controls.Add(this.BtnStartCapture);
@@ -246,7 +246,7 @@
         private System.Windows.Forms.Button BtnStartCapture;
         private System.Windows.Forms.Button BtnStopCapture;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button buttviewpackets;
+        private System.Windows.Forms.Button buttviewconnections;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Button DataConnButt;

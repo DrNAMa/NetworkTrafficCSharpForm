@@ -341,7 +341,7 @@ namespace NetworkTrafficCSharpForm
 
             return false;
         }
-        private void Buttviewpackets_Click(object sender, EventArgs e)
+        private void Buttviewconnections_Click(object sender, EventArgs e)
         {
             panel1.Visible = true;
             //string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\\Users\\(USER)\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\(USER)\\source\\repos\\NetworkTrafficCSharpForm\\NetworkTrafficCSharpForm\\IPLogs.mdf;Integrated Security=True"; //
@@ -704,3 +704,24 @@ namespace NetworkTrafficCSharpForm
 //        }
 //    }
 //}
+
+//OLD Reference Versions
+//﻿<? xml version = "1.0" encoding = "utf-8" ?>
+//< packages >
+//  < package id = "HtmlAgilityPack" version = "1.11.46" targetFramework = "net48" />
+//  < package id = "Microsoft.Bcl.AsyncInterfaces" version = "11.0.0" targetFramework = "net481" />
+//  < package id = "Microsoft.Extensions.DependencyInjection.Abstractions" version = "11.0.0" targetFramework = "net481" />
+//  < package id = "Microsoft.Extensions.Options" version = "6.0.0" targetFramework = "net481" />
+//  < package id = "Microsoft.Extensions.Primitives" version = "6.0.0" targetFramework = "net481" />
+//  < package id = "PacketDotNet" version = "1.4.6" targetFramework = "net48" />
+//  < package id = "SharpPcap" version = "6.2.5" targetFramework = "net481" />
+//  < package id = "System.Buffers" version = "4.6.1" targetFramework = "net481" />
+//  < package id = "System.Memory" version = "4.5.5" targetFramework = "net481" />
+//  < package id = "System.Numerics.Vectors" version = "4.5.0" targetFramework = "net481" />
+//  < package id = "System.Runtime.CompilerServices.Unsafe" version = "6.1.2" targetFramework = "net481" />
+//  < package id = "System.Text.Encoding.CodePages" version = "9.0.2" targetFramework = "net481" />
+//  < package id = "System.Text.Encodings.Web" version = "4.5.1" targetFramework = "net481" />
+//  < package id = "System.Text.Json" version = "2.0.0.11" targetFramework = "net481" />
+//  < package id = "System.Threading.Tasks.Extensions" version = "4.6.3" targetFramework = "net481" />
+//  < package id = "System.ValueTuple" version = "4.6.2" targetFramework = "net481" />
+//</ packages >
